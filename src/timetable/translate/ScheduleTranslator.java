@@ -186,13 +186,13 @@ public class ScheduleTranslator {
                     }
                     //CourseCode to CourseNo
                     if (!tempCTS.courseCode.equals("") || !tempCTS.altCourseCode.equals("")) {
-                        if(!tempCTS.courseCode.equals("")){
+                        if (!tempCTS.courseCode.equals("")) {
                             tempCTS.courseNo = courseList.indexOf(tempCTS.courseCode) + 1;
                         }
                         if (!tempCTS.altCourseCode.equals("")) {
                             tempCTS.altCourseNo = courseList.indexOf(tempCTS.altCourseCode) + 1;
                         }
-                        
+
                     }
                     //Room Number(String) Extraction
                     if ((semesterTables[i].table[j][k].contains("FF-"))
@@ -216,9 +216,9 @@ public class ScheduleTranslator {
                         if ((semesterTables[i].altTable[j][k].contains("SF-"))) {
                             tempCTS.altRoomNoStr = "SF-" + semesterTables[i].altTable[j][k].split("SF-")[1].substring(0, 3);
                         }
-                    }else{
+                    } else {
                         tempCTS.roomNoStr = semesterTables[i].section.substring(
-                                semesterTables[i].section.indexOf("[")+1, 
+                                semesterTables[i].section.indexOf("[") + 1,
                                 semesterTables[i].section.indexOf("]"));
 //                        tempCTS.altRoomNoStr = semesterTables[i].section.substring(
 //                                semesterTables[i].section.indexOf("[")+1, 
@@ -228,11 +228,11 @@ public class ScheduleTranslator {
                     List<String> roomsList;
                     roomsList = Arrays.asList(Constants.CLASSROOMS);
                     tempCTS.roomNo = roomsList.indexOf(tempCTS.roomNoStr);
-                    if(!tempCTS.altCourseCode.equals("")){
+                    if (!tempCTS.altCourseCode.equals("")) {
                         tempCTS.altRoomNo = roomsList.indexOf(tempCTS.altRoomNoStr);
                     }
                     //Extract TimeSlot
-                    int tempTimeSlot = (j)*8 + k;
+                    int tempTimeSlot = (j) * 8 + k;
                     tempCTS.timeSlotNo = tempTimeSlot + 1;  //coz db starts at 1
 
                     courseTimesList.add(tempCTS);

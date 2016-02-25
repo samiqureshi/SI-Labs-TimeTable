@@ -24,11 +24,24 @@ public class DataBaseReader {
     }
     
     public boolean queryTest() throws SQLException{
-    Statement s = conn.createStatement();
-    ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");
-    while (rs.next()) {
-        System.out.println(rs.getString(1));
+        Statement s = conn.createStatement();
+        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");
+        while (rs.next()) {
+            System.out.println(rs.getString(1));
+        }   
+        return true;
     }
+    
+    public boolean queryAllClashes() throws SQLException{
+        Statement s = conn.createStatement();
+        ResultSet rs = s.executeQuery("SELECT CNo, CCode, CName, RoomName "
+                + "FROM COURSE_TIMESLOT "
+                + "INNER JOIN COURSE ON CNo_FK = CNo "
+                + "INNER JOIN ROOM ON RoomNo_FK = RoomNo "
+                + "WHERE TSNo_FK=1");
+        while (rs.next()) {
+            System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4));
+        }       
         
         return true;
     }

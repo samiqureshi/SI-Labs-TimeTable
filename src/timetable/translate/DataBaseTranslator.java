@@ -6,6 +6,7 @@
 package timetable.translate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import timetable.bo.CourseStruct;
 import timetable.bo.CourseTimeSlotStruct;
 import timetable.bo.StudentStruct;
 import timetable.bo.TableStruct;
+import timetable.utility.Constants;
 
 /**
  *
@@ -21,7 +23,7 @@ import timetable.bo.TableStruct;
 public class DataBaseTranslator {
 
 
-    public List<String> classRoomInsertStatements(String[] classrooms){
+    public List<String> convertToClassRoomInsertStatements(String[] classrooms){
         List<String> instructions = new ArrayList<>();
         for(int i=1; i<classrooms.length; i++){
             String temp = "INSERT into ROOM (RoomNo, RoomName) VALUES ("
@@ -34,15 +36,14 @@ public class DataBaseTranslator {
 
     public List<String> convertToCourseInsertStatements(List<CourseStruct> coursesInfo, List<String> courseList, List<String> teacherList) {
         List<String> instructions = new ArrayList<>();
-        String course;
-        
-
+        List<String> batches = new ArrayList<>(Arrays.asList(Constants.BATCHES));
         for(int i=0; i<coursesInfo.size(); i++){
-            String temp = "INSERT into COURSE (CNo, CCode, CName, TID_FK) VALUES ("
+            String temp = "INSERT into COURSE (CNo, CCode, CName, TID_FK, BatchNo_FK) VALUES ("
                     + (i+1) + ", '"
                     + coursesInfo.get(i).courseCode + "', '"
                     + coursesInfo.get(i).courseTitle + "', "
-                    + (teacherList.indexOf(coursesInfo.get(i).teacher)+1) + ")";
+                    + (teacherList.indexOf(coursesInfo.get(i).teacher)+1) + ", "
+                    + batches.indexOf(coursesInfo.get(i).batch) + ")" ;
             instructions.add(temp);
             courseList.add(coursesInfo.get(i).courseCode);
         }    

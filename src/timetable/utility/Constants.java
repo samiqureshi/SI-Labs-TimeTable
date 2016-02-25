@@ -14,7 +14,7 @@ package timetable.utility;
 public class Constants {
     
 //    public static int NUMBER_OF_SHEETS = 1;
-    public static String[] BATCHES = {"BLANK", "1A", "1B", "2A", "2B", "3", "4", "5", "6"};
+    public static String[] BATCHES = {"BLANK", "CS1A", "CS1B", "CS2A", "CS2B", "CS3", "CS4", "CS5", "CS6"};
     public static int NUMBER_OF_SHEETS;
     public static String[] CLASSROOMS = {"BLANK", "FF-107", "FF-119", "GF-054", 
         "FF-148", "FF-105", "FF-122", "SF-217", "GF-035", "FF-104", "FF-150", 

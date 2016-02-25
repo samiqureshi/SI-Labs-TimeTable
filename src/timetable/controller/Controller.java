@@ -67,11 +67,11 @@ public class Controller {
         CourseInfoTranslator ciTranslator = new CourseInfoTranslator();
         ScheduleReader schReader = new ScheduleReader();
         DataBaseWriter dbWriter = new DataBaseWriter();
-
         ScheduleTranslator schTranslator = new ScheduleTranslator();
         StudentInfoReader stReader = new StudentInfoReader();
         StudentInfoTranslator stTranslator = new StudentInfoTranslator();
-        classRoomInsertStatements = dbTranslator.classRoomInsertStatements(
+
+        classRoomInsertStatements = dbTranslator.convertToClassRoomInsertStatements(
                 Constants.CLASSROOMS);
         dbWriter.runInsertStatements(classRoomInsertStatements);
 
@@ -92,12 +92,27 @@ public class Controller {
         dbWriter.runInsertStatements(scheduleInsertStatements);
 
         workbook = stReader.read();
-        stTranslator.convertToStudentMap(workbook, studentsInfo, coursesInfo);
+        stTranslator.convertToStudentMap(workbook, studentsInfo, coursesInfo, courseList);
         studentInsertStatements = dbTranslator.convertToStudentInsertStatements(studentsInfo, studentList);
+        
         enrolmentInsertStatements = dbTranslator.convertToEnrolmentInsertStatements(coursesInfo, courseList);
         dbWriter.runInsertStatements(studentInsertStatements);
         dbWriter.runInsertStatements(enrolmentInsertStatements);
 
+        return true;
+    }
+    
+    public boolean testQuery() throws SQLException{
+        DataBaseReader dbReader = new DataBaseReader();
+        dbReader.queryTest();
+        return true;
+        
+    }
+    
+    public boolean getAllClashes() throws SQLException{
+        DataBaseReader dbReader = new DataBaseReader();
+        dbReader.queryAllClashes();
+        
         return true;
     }
 

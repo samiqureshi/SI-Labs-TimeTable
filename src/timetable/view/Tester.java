@@ -16,8 +16,10 @@ import timetable.controller.Controller;
 public class Tester {
     public static void main(String[] args ) throws IOException, SQLException{
         Controller controller = new Controller();
-        controller.clearDataBase();
-        controller.loadDataBase();
+//        controller.clearDataBase();
+//        controller.loadDataBase();
+//        controller.testQuery();
+        controller.getAllClashes();
         
         
 //        controller.writeClassRooms();

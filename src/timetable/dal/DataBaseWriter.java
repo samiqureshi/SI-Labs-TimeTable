@@ -30,6 +30,8 @@ public class DataBaseWriter {
         s.execute("DELETE * FROM [COURSE_TIMESLOT]");
         s.execute("DELETE * FROM [TEACHER]");
         s.execute("DELETE * FROM [ROOM]");
+        s.execute("DELETE * FROM [STUDENT]");
+        s.execute("DELETE * FROM [STUDENT_COURSE]");
         return true;
     }
     

@@ -24,7 +24,8 @@ public class StudentInfoTranslator {
 
     public boolean convertToStudentMap(XSSFWorkbook workbook, 
             HashMap<String, String> studentMap, 
-            List<CourseStruct> coursesInfo) {
+            List<CourseStruct> coursesInfo,
+            List<String> courseList) {
         XSSFSheet[] enrolmentSheets = new XSSFSheet[workbook.getNumberOfSheets()];
 //        XSSFRow[] row = new XSSFRow[workbook.getNumberOfSheets()];
 //        XSSFCell[] cell = new XSSFCell[workbook.getNumberOfSheets()];
@@ -38,7 +39,8 @@ public class StudentInfoTranslator {
                     tempStudent.studentName = row.getCell(1).getStringCellValue();
                     if ((!tempStudent.studentID.equals("Registration Number"))
                             && (!tempStudent.studentID.equals("Name"))) {
-                        coursesInfo.get(iSheet).enrolledStudents.add(tempStudent);
+                        
+                        coursesInfo.get(courseList.indexOf(workbook.getSheetName(iSheet))).enrolledStudents.add(tempStudent);
                         studentMap.put(tempStudent.studentID, tempStudent.studentName);
                     }
 
