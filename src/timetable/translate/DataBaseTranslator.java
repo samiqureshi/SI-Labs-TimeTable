@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import timetable.bo.CourseStruct;
 import timetable.bo.CourseTimeSlotStruct;
 import timetable.bo.StudentStruct;
@@ -23,10 +22,11 @@ import timetable.utility.Constants;
 public class DataBaseTranslator {
 
 
-    public List<String> convertToClassRoomInsertStatements(String[] classrooms){
-        List<String> instructions = new ArrayList<>();
+    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){
+        ArrayList<String> instructions = new ArrayList<>();
         for(int i=1; i<classrooms.length; i++){
-            String temp = "INSERT into ROOM (RoomNo, RoomName) VALUES ("
+            String temp = "INSERT into ROOM (RoomN"
+                    + "o, RoomName) VALUES ("
                     + i + ", '"
                     + classrooms[i] + "')";
             instructions.add(temp);
@@ -34,9 +34,9 @@ public class DataBaseTranslator {
         return instructions;
     }
 
-    public List<String> convertToCourseInsertStatements(List<CourseStruct> coursesInfo, List<String> courseList, List<String> teacherList) {
-        List<String> instructions = new ArrayList<>();
-        List<String> batches = new ArrayList<>(Arrays.asList(Constants.BATCHES));
+    public ArrayList<String> convertToCourseInsertStatements(ArrayList<CourseStruct> coursesInfo, ArrayList<String> courseList, ArrayList<String> teacherList) {
+        ArrayList<String> instructions = new ArrayList<>();
+        ArrayList<String> batches = new ArrayList<>(Arrays.asList(Constants.BATCHES));
         for(int i=0; i<coursesInfo.size(); i++){
             String temp = "INSERT into COURSE (CNo, CCode, CName, TID_FK, BatchNo_FK) VALUES ("
                     + (i+1) + ", '"
@@ -50,27 +50,27 @@ public class DataBaseTranslator {
         return instructions;
     }
     
-    public List<String> convertToScheduleInsertStatements(List<CourseTimeSlotStruct> coursesInfo){ 
-        List<String> instructions = new ArrayList<>();
+    public ArrayList<String> convertToScheduleInsertStatements(ArrayList<CourseTimeSlotStruct> coursesTSInfo){ 
+        ArrayList<String> instructions = new ArrayList<>();
         String tempCCode;
         int i=0;
         int index = 1;
-        while (i < coursesInfo.size()) {
-            if (!coursesInfo.get(i).courseCode.equals("")) {
+        while (i < coursesTSInfo.size()) {
+            if (!coursesTSInfo.get(i).courseCode.equals("")) {
                 String temp = "INSERT into COURSE_TIMESLOT (CTSNo, CNo_FK, TSNo_FK, RoomNo_FK) VALUES ("
                         + index + ", "
-                        + coursesInfo.get(i).courseNo + ", "
-                        + coursesInfo.get(i).timeSlotNo + ", "
-                        + coursesInfo.get(i).roomNo + ")";
+                        + coursesTSInfo.get(i).courseNo + ", "
+                        + coursesTSInfo.get(i).timeSlotNo + ", "
+                        + coursesTSInfo.get(i).roomNo + ")";
                 instructions.add(temp);
                 index++;
                 
-                if (!coursesInfo.get(i).altCourseCode.equals("")) {
+                if (!coursesTSInfo.get(i).altCourseCode.equals("")) {
                     temp = "INSERT into COURSE_TIMESLOT (CTSNo, CNo_FK, TSNo_FK, RoomNo_FK) VALUES ("
                             + index + ", "
-                            + coursesInfo.get(i).altCourseNo + ", "
-                            + coursesInfo.get(i).timeSlotNo + ", "
-                            + coursesInfo.get(i).altRoomNo + ")";
+                            + coursesTSInfo.get(i).altCourseNo + ", "
+                            + coursesTSInfo.get(i).timeSlotNo + ", "
+                            + coursesTSInfo.get(i).altRoomNo + ")";
                     instructions.add(temp);
                     index++;
                     i++;
@@ -79,7 +79,7 @@ public class DataBaseTranslator {
             } 
             i++;
         }
-//        for (int i = 0; i < coursesInfo.size(); i++) {
+//        for (int i = 0; i < coursesTSInfo.size(); i++) {
 //            
 //
 //            
@@ -91,9 +91,9 @@ public class DataBaseTranslator {
         return instructions;
     }
     
-    public List<String> convertToTeacherInsertStatements(List<CourseStruct> coursesInfo, List<String> teacherList){
+    public ArrayList<String> convertToTeacherInsertStatements(ArrayList<CourseStruct> coursesInfo, ArrayList<String> teacherList){
         
-        List<String> instructions = new ArrayList<>();
+        ArrayList<String> instructions = new ArrayList<>();
         HashSet<String> teacherSet = new HashSet<>();
         for(int i=1; i<coursesInfo.size(); i++){
             if(!"".equals(coursesInfo.get(i).teacher)){
@@ -113,9 +113,9 @@ public class DataBaseTranslator {
         return instructions;
     }
 
-    public List<String> convertToStudentInsertStatements(HashMap<String, String> studentsInfo, List<String> studentList) {
+    public ArrayList<String> convertToStudentInsertStatements(HashMap<String, String> studentsInfo, ArrayList<String> studentList) {
 
-        List<String> instructions = new ArrayList<>();
+        ArrayList<String> instructions = new ArrayList<>();
         studentList.addAll(studentsInfo.keySet());
         for(String temp : studentList){
             temp = temp.substring(0, 8);
@@ -131,8 +131,8 @@ public class DataBaseTranslator {
         return instructions;
     }
     
-    public List<String> convertToEnrolmentInsertStatements(List<CourseStruct> coursesInfo, List<String> courseList){
-        List<String> instructions = new ArrayList<>();
+    public ArrayList<String> convertToEnrolmentInsertStatements(ArrayList<CourseStruct> coursesInfo, ArrayList<String> courseList){
+        ArrayList<String> instructions = new ArrayList<>();
         int eIndex = 1;
         for(CourseStruct tempCourse : coursesInfo){
             for(StudentStruct tempStudent : tempCourse.enrolledStudents){

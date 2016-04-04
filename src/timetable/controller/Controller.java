@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+//import java.util.List;
+import java.util.Scanner;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import timetable.bo.CourseStruct;
 import timetable.bo.CourseTimeSlotStruct;
@@ -20,6 +22,7 @@ import timetable.translate.DataBaseTranslator;
 import timetable.translate.ScheduleTranslator;
 import timetable.translate.StudentInfoTranslator;
 import timetable.utility.Constants;
+import static timetable.utility.Constants.TIMESLOTS;
 
 /**
  *
@@ -28,19 +31,19 @@ import timetable.utility.Constants;
 public class Controller {
 
     private TableStruct[] semesterTables;
-    private List<CourseStruct> coursesInfo;
+    private ArrayList<CourseStruct> coursesInfo;
     private HashMap<String, String> studentsInfo;
-    private List<CourseTimeSlotStruct> scheduleInfo;
+    private ArrayList<CourseTimeSlotStruct> scheduleInfo;
     private XSSFWorkbook workbook;
-    private List<String> courseInsertStatements;
-    private List<String> teacherInsertStatements;
-    private List<String> studentInsertStatements;
-    private List<String> scheduleInsertStatements;
-    private List<String> classRoomInsertStatements;
-    private List<String> enrolmentInsertStatements;
-    private List<String> teacherList;
-    private List<String> courseList;
-    private List<String> studentList;
+    private ArrayList<String> courseInsertStatements;
+    private ArrayList<String> teacherInsertStatements;
+    private ArrayList<String> studentInsertStatements;
+    private ArrayList<String> scheduleInsertStatements;
+    private ArrayList<String> classRoomInsertStatements;
+    private ArrayList<String> enrolmentInsertStatements;
+    private ArrayList<String> teacherList;
+    private ArrayList<String> courseList;
+    private ArrayList<String> studentList;
 
     public Controller() throws SQLException {
         semesterTables = new TableStruct[15];
@@ -109,11 +112,43 @@ public class Controller {
         
     }
     
-    public boolean getAllClashes() throws SQLException{
+    //Returns List of 40 Lists, one for each timeslot of the week
+    public ArrayList<ArrayList<String>> getAllClashes() throws SQLException{
         DataBaseReader dbReader = new DataBaseReader();
-        dbReader.queryAllClashes();
-        
-        return true;
+        return dbReader.queryAllClashes();
     }
+
+    //Returns List of scheduled courses for a particular TimeSlot Number.
+    public ArrayList<String> getTimeSlotClashes(int tsno) throws SQLException{
+        DataBaseReader dbReader = new DataBaseReader();
+        return dbReader.queryTimeSlotClashes(tsno);
+    }
+    
+    //Returns list of conflicting Timeslots for a student (sid) trying to register for a new course (ccode)
+    public ArrayList<String> getStudentCourseClashes(String sid, String ccode) throws SQLException{
+        DataBaseReader dbReader = new DataBaseReader();
+        HashSet<Integer> studentClashSet = new HashSet<>();
+        int cno = dbReader.queryCourseNo(ccode);
+        ArrayList<Integer> courseClashes = dbReader.queryCourseTimeSlots(cno);
+        ArrayList<String> result = new ArrayList<>();
+        ArrayList<Integer> tempStudentCourses = dbReader.queryStudentCourses(sid);
+        for(int tempCNo : tempStudentCourses){
+            if(tempCNo != cno){
+                ArrayList<Integer> tempStudentClashes = dbReader.queryCourseTimeSlots(tempCNo);
+                studentClashSet.addAll(tempStudentClashes);
+            }
+            
+        }        
+        for(int tempTimeSlot : courseClashes){
+            if(studentClashSet.contains(tempTimeSlot)){
+                result.add(TIMESLOTS[tempTimeSlot]);
+            }
+        }
+        return result;
+       
+    }
+    
+
+    
 
 }

@@ -6,9 +6,9 @@
 package timetable.translate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -55,8 +55,8 @@ public class ScheduleTranslator {
                         = semesterSheets[iSheet].getRow(3).getCell(1).
                         getStringCellValue();
 
-                List<CellRangeAddress> allMergedRegions = semesterSheets[iSheet].getMergedRegions();
-                List<CellStruct> mergedRegions = new ArrayList<>();
+                ArrayList<CellRangeAddress> allMergedRegions = (ArrayList<CellRangeAddress>) semesterSheets[iSheet].getMergedRegions();
+                ArrayList<CellStruct> mergedRegions = new ArrayList<>();
                 Iterator<CellRangeAddress> iter = allMergedRegions.iterator();
                 while (iter.hasNext()) {
                     CellRangeAddress region = iter.next();
@@ -139,9 +139,9 @@ public class ScheduleTranslator {
         return true;
     }
 
-    public List<CourseTimeSlotStruct> parseSchedule(TableStruct[] semesterTables, List<String> courseList) {
+    public ArrayList<CourseTimeSlotStruct> parseSchedule(TableStruct[] semesterTables, ArrayList<String> courseList) {
 //        TableStruct[] temp = new TableStruct[semesterTables.length];
-        List<CourseTimeSlotStruct> courseTimesList = new ArrayList<>();
+        ArrayList<CourseTimeSlotStruct> courseTimesList = new ArrayList<>();
         CourseTimeSlotStruct tempCTS;
 //        int temp = Constants.NUMBER_OF_SHEETS;
         for (int i = 0; i < Constants.NUMBER_OF_SHEETS; i++) {
@@ -166,7 +166,7 @@ public class ScheduleTranslator {
                     } else {      //Batch with sections i.e. CS-2A
                         if (!semesterTables[i].table[j][k].equals("")) {      //if not empty
                             tempCTS.courseCode = semesterTables[i].table[j][k].split(" ")[0] + semesterTables[i].section.charAt(4);
-                            if (semesterTables[i].table[j][k].contains(" L")) {  //if LAB ourse
+                            if (semesterTables[i].table[j][k].contains(" L")) {  //if LAB course
                                 tempCTS.courseCode += "-L";
                                 if (semesterTables[i].table[j][k].contains("SEC")) {
                                     tempCTS.courseCode += semesterTables[i].table[j][k].split("SEC ")[1].charAt(1);

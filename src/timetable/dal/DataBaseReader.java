@@ -10,40 +10,123 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import static timetable.utility.Constants.CLASSROOMS;
 
 /**
  *
  * @author Qureshi
  */
 public class DataBaseReader {
-    
+
     Connection conn;
 
     public DataBaseReader() throws SQLException {
         this.conn = DriverManager.getConnection("jdbc:ucanaccess://C:/Users/Qureshi/Documents/SI Labs/SI-Labs-TimeTable/SILABS_DB.accdb");
     }
-    
-    public boolean queryTest() throws SQLException{
+
+    public boolean queryTest() throws SQLException {
         Statement s = conn.createStatement();
         ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");
         while (rs.next()) {
             System.out.println(rs.getString(1));
-        }   
+
+        }
         return true;
     }
-    
-    public boolean queryAllClashes() throws SQLException{
+
+    public ArrayList<ArrayList<String>> queryAllClashes() throws SQLException {
         Statement s = conn.createStatement();
-        ResultSet rs = s.executeQuery("SELECT CNo, CCode, CName, RoomName "
-                + "FROM COURSE_TIMESLOT "
-                + "INNER JOIN COURSE ON CNo_FK = CNo "
-                + "INNER JOIN ROOM ON RoomNo_FK = RoomNo "
-                + "WHERE TSNo_FK=1");
-        while (rs.next()) {
-            System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4));
-        }       
         
-        return true;
+        ArrayList<ArrayList<String>> results = new ArrayList<>();
+
+        for (int i = 1; i <= 40; i++) {
+            ArrayList<String> tempResult = new ArrayList<>();
+            ResultSet rs = s.executeQuery("SELECT c.CCode, c.CName, r.RoomName "
+                    + "FROM COURSE_TIMESLOT ct "
+                    + "JOIN COURSE c ON ct.CNo_FK = c.CNo "
+                    + "JOIN ROOM r ON ct.RoomNo_FK = r.RoomNo "
+                    + "WHERE ct.TSNo_FK = " + i);
+            while (rs.next()) {
+                
+                String temp;
+                temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
+                tempResult.add(temp);
+            }
+
+            results.add(tempResult);
+        }
+        return results;
+    }
+
+
+    public ArrayList<String> queryTimeSlotClashes(int tsno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<String> result = new ArrayList<>();
+
+        ResultSet rs = s.executeQuery("SELECT c.CNo, c.CCode, c.CName, r.RoomName "
+                + "FROM COURSE_TIMESLOT ct "
+                + "JOIN COURSE c ON ct.CNo_FK = c.CNo "
+                + "JOIN ROOM r ON ct.RoomNo_FK = r.RoomNo "
+                + "WHERE ct.TSNo_FK = " + tsno);
+        while (rs.next()) {
+            String temp;
+            temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
+            result.add(temp);
+        }
+        return result;
+    }
+
+    public ArrayList<Integer> queryStudentCourseClashes(String sid, int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<Integer> results = new ArrayList<>();
+
+        String tempQuery = "";
+//        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = "+ cno +" AND CTS.CNo_FK IN (SELECT SC.CNo_FK  "
+//                + "FROM STUDENT_COURSE SC  "
+//                + "WHERE SID_FK = ' " + sid + "')";
+        ResultSet rs = s.executeQuery(tempQuery);
+        while (rs.next()) {
+            results.add(Integer.parseInt(rs.getString(1)));
+        }
+        return results;
     }
     
+    public ArrayList<Integer> queryStudentCourses(String sid) throws SQLException {
+        Statement s = conn.createStatement();
+
+        ArrayList<Integer> result = new ArrayList<>();
+        String tempQuery = "SELECT SC.CNo_FK FROM STUDENT_COURSE SC WHERE SC.SID_FK = '" + sid + "' ";
+//        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = "+ cno +" AND CTS.CNo_FK IN (SELECT SC.CNo_FK  "
+//                + "FROM STUDENT_COURSE SC  "
+//                + "WHERE SID_FK = ' " + sid + "')";
+        ResultSet rs = s.executeQuery(tempQuery);
+        while (rs.next()) {
+            result.add(Integer.parseInt(rs.getString(1)));
+        }
+        return result;
+    }
+    
+    public ArrayList<Integer> queryCourseTimeSlots(int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<Integer> result = new ArrayList<>();
+        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = " + cno + ";";
+        ResultSet rs = s.executeQuery(tempQuery);
+        while (rs.next()) {
+            result.add(Integer.parseInt(rs.getString(1)));
+        }
+        return result;
+    }
+    
+    public int queryCourseNo(String ccode) throws SQLException {
+        int cno = 0;
+        Statement s = conn.createStatement();
+        ResultSet rs = s.executeQuery("Select CNo from COURSE WHERE CCode = '" + ccode + "'");
+        if(rs.next()){
+            cno = Integer.parseInt(rs.getString(1));
+        }
+        return cno;
+    }
+
 }
