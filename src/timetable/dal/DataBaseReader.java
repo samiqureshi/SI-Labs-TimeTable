@@ -128,5 +128,26 @@ public class DataBaseReader {
         }
         return cno;
     }
+    
+    public String queryCourseCode(int cno) throws SQLException {
+        String ccode = null;
+        Statement s = conn.createStatement();
+        ResultSet rs = s.executeQuery("Select CCode from COURSE WHERE CNo = " + cno + ";");
+        if(rs.next()){
+            ccode = (rs.getString(1));
+        }
+        return ccode;
+    }
+    
+    public ArrayList<String> queryCourseEnrolments(int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<String> result = new ArrayList<>();
+        ResultSet rs = s.executeQuery("SELECT SID_FK FROM STUDENT_COURSE WHERE CNo_FK = " + cno + ";");
+        while(rs.next()){
+            result.add(rs.getString(1));
+            
+        }
+        return result;
+    }
 
 }

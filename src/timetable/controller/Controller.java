@@ -13,6 +13,7 @@ import java.util.HashSet;
 //import java.util.List;
 import java.util.Scanner;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import timetable.bo.ClashStruct;
 import timetable.bo.CourseStruct;
 import timetable.bo.CourseTimeSlotStruct;
 import timetable.bo.TableStruct;
@@ -125,30 +126,50 @@ public class Controller {
     }
     
     //Returns list of conflicting Timeslots for a student (sid) trying to register for a new course (ccode)
-    public ArrayList<String> getStudentCourseClashes(String sid, String ccode) throws SQLException{
+    public ArrayList<Integer> getStudentCourseClashes(String sid, String ccode) throws SQLException{
         DataBaseReader dbReader = new DataBaseReader();
         HashSet<Integer> studentClashSet = new HashSet<>();
         int cno = dbReader.queryCourseNo(ccode);
-        ArrayList<Integer> courseClashes = dbReader.queryCourseTimeSlots(cno);
-        ArrayList<String> result = new ArrayList<>();
-        ArrayList<Integer> tempStudentCourses = dbReader.queryStudentCourses(sid);
-        for(int tempCNo : tempStudentCourses){
+        ArrayList<Integer> courseTimeSlots = dbReader.queryCourseTimeSlots(cno);
+        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> studentCourses = dbReader.queryStudentCourses(sid);
+        ArrayList<ClashStruct> studentClashes = new ArrayList<>();
+        //Iterate through all student's courses and get all timeslots
+        for(int tempCNo : studentCourses){
             if(tempCNo != cno){
-                ArrayList<Integer> tempStudentClashes = dbReader.queryCourseTimeSlots(tempCNo);
-                studentClashSet.addAll(tempStudentClashes);
+                ArrayList<Integer> courseClashes = dbReader.queryCourseTimeSlots(tempCNo);
+                studentClashSet.addAll(courseClashes);
+            }            
+        }    
+        
+        for(int tempCourseTimeSlot : courseTimeSlots){
+            if(studentClashSet.contains(tempCourseTimeSlot)){
+                result.add(tempCourseTimeSlot);
             }
             
-        }        
-        for(int tempTimeSlot : courseClashes){
-            if(studentClashSet.contains(tempTimeSlot)){
-                result.add(TIMESLOTS[tempTimeSlot]);
-            }
         }
         return result;
        
     }
     
 
+//    public ArrayList<> getCourseTimeSlotClashes(String ccode, int tsno) throws SQLException{
+//        
+//    }
+    
+    public float getCourseConflictPercentage(String ccode1, String ccode2) throws SQLException {
+        DataBaseReader dbReader = new DataBaseReader();
+        ArrayList<String> enrolments1 = dbReader.queryCourseEnrolments(dbReader.queryCourseNo(ccode1));
+        ArrayList<String> enrolments2 = dbReader.queryCourseEnrolments(dbReader.queryCourseNo(ccode2));
+        HashSet<String> studentSet = new HashSet<>();
+        studentSet.addAll(enrolments1);
+        studentSet.addAll(enrolments2);
+        float total = studentSet.size();
+        enrolments1.retainAll(enrolments2);
+        float common = enrolments1.size();
+        return (common*100)/total;
+    }
+    
     
 
 }
