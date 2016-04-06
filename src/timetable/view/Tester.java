@@ -24,30 +24,14 @@ public class Tester {
 //        System.out.println(controller.getAllClashes());
 //        System.out.println(controller.getTimeSlotClashes(4));
 //        System.out.println(controller.getStudentCourseClashes("cs141082", "CS205"));
-        System.out.println(controller.getCourseConflictPercentage("CS206", "HU104A"));
+//        System.out.println(controller.getCourseConflictPercentage("CS31X", "CS206"));
+        System.out.println(controller.getCourseTimeSlotClashes("CS206", 39));
         
 //        System.out.println(controller.getStudentCourseNumList("cs141082"));
 //        controller.getTimeSlotClashes(4);
         
         
-        
-//        controller.writeClassRooms();
-//        controller.loadTeacherInfo();
-//        controller.writeTeacherInfo();  
-//        controller.loadStudentInfo();
-//        controller.writeStudentInfo();
-//        controller.loadCourseInfo();
-//        controller.writeCourseInfo();        
-//        controller.loadSchedule();
-//        controller.writeSchedule();      
-//        controller.loadEnrolment();
-//        controller.writeEnrolment();      
-        
-        
-        
-        
-//        controller.fetchTimeSlots();
-//        controller.printTest();
+
         
     }
 }

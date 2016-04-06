@@ -61,6 +61,7 @@ public class DataBaseReader {
     }
 
 
+    //Return list of courses scheduled at the given timeslot
     public ArrayList<String> queryTimeSlotClashes(int tsno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<String> result = new ArrayList<>();
@@ -78,21 +79,23 @@ public class DataBaseReader {
         return result;
     }
 
-    public ArrayList<Integer> queryStudentCourseClashes(String sid, int cno) throws SQLException {
-        Statement s = conn.createStatement();
-        ArrayList<Integer> results = new ArrayList<>();
-
-        String tempQuery = "";
-//        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = "+ cno +" AND CTS.CNo_FK IN (SELECT SC.CNo_FK  "
-//                + "FROM STUDENT_COURSE SC  "
-//                + "WHERE SID_FK = ' " + sid + "')";
-        ResultSet rs = s.executeQuery(tempQuery);
-        while (rs.next()) {
-            results.add(Integer.parseInt(rs.getString(1)));
-        }
-        return results;
-    }
+    //Return list of 
+//    public ArrayList<Integer> queryStudentCourseClashes(String sid, int cno) throws SQLException {
+//        Statement s = conn.createStatement();
+//        ArrayList<Integer> results = new ArrayList<>();
+//
+//        String tempQuery = "";
+////        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = "+ cno +" AND CTS.CNo_FK IN (SELECT SC.CNo_FK  "
+////                + "FROM STUDENT_COURSE SC  "
+////                + "WHERE SID_FK = ' " + sid + "')";
+//        ResultSet rs = s.executeQuery(tempQuery);
+//        while (rs.next()) {
+//            results.add(Integer.parseInt(rs.getString(1)));
+//        }
+//        return results;
+//    }
     
+    //Return list of Course Numbers the given student is enrolled in
     public ArrayList<Integer> queryStudentCourses(String sid) throws SQLException {
         Statement s = conn.createStatement();
 
@@ -108,6 +111,7 @@ public class DataBaseReader {
         return result;
     }
     
+    //Return list of Time Slots the given course is scheduled at
     public ArrayList<Integer> queryCourseTimeSlots(int cno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<Integer> result = new ArrayList<>();
@@ -119,6 +123,7 @@ public class DataBaseReader {
         return result;
     }
     
+    //Convert Course Code (CS206) into Course Number (45) entered in the database
     public int queryCourseNo(String ccode) throws SQLException {
         int cno = 0;
         Statement s = conn.createStatement();
@@ -129,6 +134,7 @@ public class DataBaseReader {
         return cno;
     }
     
+    //Convert Course Number into Course Code
     public String queryCourseCode(int cno) throws SQLException {
         String ccode = null;
         Statement s = conn.createStatement();
@@ -139,13 +145,13 @@ public class DataBaseReader {
         return ccode;
     }
     
+    //Return list of Student IDs enrolled in the given course
     public ArrayList<String> queryCourseEnrolments(int cno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<String> result = new ArrayList<>();
         ResultSet rs = s.executeQuery("SELECT SID_FK FROM STUDENT_COURSE WHERE CNo_FK = " + cno + ";");
         while(rs.next()){
             result.add(rs.getString(1));
-            
         }
         return result;
     }

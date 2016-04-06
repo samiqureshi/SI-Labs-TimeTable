@@ -60,11 +60,13 @@ public class Controller {
         studentList = new ArrayList<>();
     }
 
+    //Admin
     public boolean clearDataBase() throws SQLException {
         DataBaseWriter dbWriter = new DataBaseWriter();
         return dbWriter.clearAllTables();
     }
 
+    //Admin
     public boolean loadDataBase() throws SQLException, IOException {
         DataBaseTranslator dbTranslator = new DataBaseTranslator();
         CourseInfoReader ciReader = new CourseInfoReader();
@@ -106,6 +108,7 @@ public class Controller {
         return true;
     }
     
+    //Admin
     public boolean testQuery() throws SQLException{
         DataBaseReader dbReader = new DataBaseReader();
         dbReader.queryTest();
@@ -142,6 +145,7 @@ public class Controller {
             }            
         }    
         
+        //Check if any of the student's timeslots clash with any of the course timeslots
         for(int tempCourseTimeSlot : courseTimeSlots){
             if(studentClashSet.contains(tempCourseTimeSlot)){
                 result.add(tempCourseTimeSlot);
@@ -150,13 +154,30 @@ public class Controller {
         }
         return result;
        
+    }    
+
+    //Return list of clashes with Course Code and Conflict Percentage for rescheduling a course (ccode) to a new time (tsno)
+    public ArrayList<String> getCourseTimeSlotClashes(String ccode, int tsno) throws SQLException{
+        DataBaseReader dbReader = new DataBaseReader();
+        ArrayList<String> clashedCourses = dbReader.queryTimeSlotClashes(tsno);
+        ArrayList<String> clashedCourseCodes = new ArrayList<>();
+        ArrayList<String> clashedCourseCodesWithPc = new ArrayList<>();
+        for(String course : clashedCourses){
+            String temp = course.split(" ")[1].split(" ")[0];
+            clashedCourseCodes.add(temp);
+        }
+        for(String temp : clashedCourseCodes){
+            int i = clashedCourseCodes.indexOf(temp);
+            float pc = getCourseConflictPercentage(ccode, temp);
+            String tempPc = temp + " " + pc;
+            clashedCourseCodesWithPc.add(tempPc);
+        }
+        
+        return clashedCourseCodesWithPc;
+        
     }
     
-
-//    public ArrayList<> getCourseTimeSlotClashes(String ccode, int tsno) throws SQLException{
-//        
-//    }
-    
+    //Returns percentage of students enrolled in both given courses over total studnets in both (Intersection/Union)
     public float getCourseConflictPercentage(String ccode1, String ccode2) throws SQLException {
         DataBaseReader dbReader = new DataBaseReader();
         ArrayList<String> enrolments1 = dbReader.queryCourseEnrolments(dbReader.queryCourseNo(ccode1));
@@ -168,8 +189,6 @@ public class Controller {
         enrolments1.retainAll(enrolments2);
         float common = enrolments1.size();
         return (common*100)/total;
-    }
-    
-    
+    }    
 
 }
