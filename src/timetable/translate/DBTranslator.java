@@ -6,31 +6,60 @@
 package timetable.translate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 
 /**
  *
  * @author Qureshi
  */
 public class DBTranslator {
-    public ArrayList<String> translateBatchInsertStatements(XSSFWorkbook batchWorkbook){
+
+    public ArrayList<String> translateBatchInsertStatements(XSSFWorkbook batchWorkbook) {
         ArrayList<String> batchInsertStatements = new ArrayList<>();
         XSSFSheet batchSheet = batchWorkbook.getSheetAt(0);
-        
-        for(Row row : batchSheet){
+
+        for (Row row : batchSheet) {
             String stmt = "INSERT INTO BATCH VALUES(" + row.getCell(0).toString() + ", '" + row.getCell(1).getStringCellValue() + "');";
             batchInsertStatements.add(stmt);
-            
+
         }
 //        semesterSheets[iSheet] = workbook.getSheetAt(iSheet);
-        
+
         return batchInsertStatements;
     }
 
+    public ArrayList<String> translateTeacherInsertStatements(XSSFWorkbook courseWorkbook) {
+        HashSet<String> teacherMap = new HashSet<>();
+        ArrayList<String> teacherInsertStatements = new ArrayList<>();
+        XSSFSheet courseSheet = courseWorkbook.getSheetAt(0);
 
+        for (Row row : courseSheet) {
+            if (row.getCell(4) != null) {
+                teacherMap.add(row.getCell(4).getStringCellValue());
+            }
+        }
+        int i = 1;
+        for (String teacher : teacherMap) {
+
+            String stmt = "INSERT INTO TEACHER VALUES (" + i + ", '" + teacher + "');";
+            teacherInsertStatements.add(stmt);
+            i++;
+        }
+
+        return teacherInsertStatements;
+    }
+
+    public ArrayList<String> translateCourseInsertStatements(XSSFWorkbook courseWorkbook){
+        ArrayList<String> courseInsertStatements = new ArrayList<>();
+        XSSFSheet courseSheet = courseWorkbook.getSheetAt(0);
+        for(Row row : courseSheet){
+            String stmt = "INSERT INTO COURSE VALUES(" + "";
+        }
+        return courseInsertStatements;
+    }
 //    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){
 //        ArrayList<String> instructions = new ArrayList<>();
 //        for(int i=1; i<classrooms.length; i++){
@@ -157,5 +186,4 @@ public class DBTranslator {
 //        
 //        return instructions;
 //    }
-
 }

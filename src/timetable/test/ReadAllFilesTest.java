@@ -13,7 +13,7 @@ import timetable.handler.LoadHandler;
  *
  * @author SamiQureshi
  */
-public class CourseFileReadTest {
+public class ReadAllFilesTest {
     public static void main(String[] args){
         Handler handler = new LoadHandler();
         ArrayList<Integer> actionCode = new ArrayList<>();

@@ -32,14 +32,16 @@ public class DBWriter {
     
     public boolean clearAllTables() throws SQLException{
         Statement s = conn.createStatement();
-        String temp = "DELETE FROM BATCH;";
-        s.execute(temp);
+        
+        s.execute("DELETE FROM BATCH;");
+        s.execute("DELETE FROM TEACHER;");
 //        s.execute("DELETE FROM [COURSE]");
 //        s.execute("DELETE FROM [COURSE_TIMESLOT]");
 //        s.execute("DELETE FROM [TEACHER]");
 //        s.execute("DELETE FROM [ROOM]");
 //        s.execute("DELETE FROM [STUDENT]");
 //        s.execute("DELETE * FROM [STUDENT_COURSE]");
+
         return true;
     }
     
@@ -69,7 +71,6 @@ public class DBWriter {
         for(String sql : instructions){
             s.execute(sql);
         }
-        
         return true;
     }
     

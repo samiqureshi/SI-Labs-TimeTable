@@ -34,14 +34,21 @@ public class LoadHandler extends Handler{
         try {
             switch(actionCode.get(0)){
                 case 0:     //Load All Files
-                    XSSFWorkbook batchWorkbook = fileReader.readBatchFile();
+                    XSSFWorkbook batchWorkbook = fileReader.readBatchFile();                    
+                    XSSFWorkbook courseWorkbook = fileReader.readCourseFile();
+                    
                     ArrayList<String> batchInsertStatements = 
                             dbTranslator.translateBatchInsertStatements(batchWorkbook);
+                    ArrayList<String> teacherInsertStatements = 
+                            dbTranslator.translateTeacherInsertStatements(courseWorkbook);
+                    ArrayList<String> courseInsertStatements = 
+                            dbTranslator.translateCourseInsertStatements(courseWorkbook);
                     dbWriter.clearAllTables();
                     dbWriter.runInsertStatements(batchInsertStatements);
+                    dbWriter.runInsertStatements(teacherInsertStatements);
                     
                     
-                    XSSFWorkbook courseWorkbook = fileReader.readCourseFile();
+                    
                     break;
                     
                 case 1:

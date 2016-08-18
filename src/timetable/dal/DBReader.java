@@ -1,31 +1,42 @@
-///*
-// * To change this license header, choose License Headers in Project Properties.
-// * To change this template file, choose Tools | Templates
-// * and open the template in the editor.
-// */
-//package timetable.dal;
-//
-//import java.sql.Connection;
-//import java.sql.DriverManager;
-//import java.sql.ResultSet;
-//import java.sql.SQLException;
-//import java.sql.Statement;
-//import java.util.ArrayList;
-//import java.util.List;
-//import static timetable.utility.Constants.CLASSROOMS;
-//
-///**
-// *
-// * @author Qureshi
-// */
-//public class DataBaseReader {
-//
-//    Connection conn;
-//
-//    public DataBaseReader() throws SQLException {
-//        this.conn = DriverManager.getConnection("jdbc:ucanaccess://C:/Users/Qureshi/Documents/SI Labs/SI-Labs-TimeTable/SILABS_DB.accdb");
-//    }
-//
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package timetable.dal;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import static timetable.utility.Constants.CLASSROOMS;
+
+/**
+ *
+ * @author Qureshi
+ */
+public class DBReader {
+
+    Connection conn;
+
+    public DBReader() throws SQLException, ClassNotFoundException {
+        Class.forName("org.h2.Driver");
+        this.conn = DriverManager.getConnection("jdbc:h2:~/test", "samiqureshi", "sq3147");
+    }
+
+    public int getBatchNo(String batch) throws SQLException{
+        Statement s = conn.createStatement();
+        int batchNo = 0;
+        ResultSet rs = s.executeQuery("SELECT BATCH_NO FROM BATCH WHERE BATCH_NAME = '" + batch + "';");
+        
+        if(rs.next()){
+            batchNo = rs.getInt(1);
+        }
+        return batchNo;
+    }
 //    public boolean queryTest() throws SQLException {
 //        Statement s = conn.createStatement();
 //        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");
@@ -79,22 +90,6 @@
 //        return result;
 //    }
 //
-//    //Return list of 
-////    public ArrayList<Integer> queryStudentCourseClashes(String sid, int cno) throws SQLException {
-////        Statement s = conn.createStatement();
-////        ArrayList<Integer> results = new ArrayList<>();
-////
-////        String tempQuery = "";
-//////        String tempQuery = "SELECT CTS.TSNo_FK FROM COURSE_TIMESLOT CTS WHERE CTS.CNo_FK = "+ cno +" AND CTS.CNo_FK IN (SELECT SC.CNo_FK  "
-//////                + "FROM STUDENT_COURSE SC  "
-//////                + "WHERE SID_FK = ' " + sid + "')";
-////        ResultSet rs = s.executeQuery(tempQuery);
-////        while (rs.next()) {
-////            results.add(Integer.parseInt(rs.getString(1)));
-////        }
-////        return results;
-////    }
-//    
 //    //Return list of Course Numbers the given student is enrolled in
 //    public ArrayList<Integer> queryStudentCourses(String sid) throws SQLException {
 //        Statement s = conn.createStatement();
@@ -155,5 +150,5 @@
 //        }
 //        return result;
 //    }
-//
-//}
+
+}
