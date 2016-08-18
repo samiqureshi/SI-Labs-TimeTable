@@ -16,22 +16,30 @@ import java.util.List;
  *
  * @author Qureshi
  */
-public class DataBaseWriter {
+
+
+        
+
+public class DBWriter {
+    
     Connection conn;
 
-    public DataBaseWriter() throws SQLException {
-        this.conn = DriverManager.getConnection("jdbc:ucanaccess://C:/Users/Qureshi/Documents/SI Labs/SI-Labs-TimeTable/SILABS_DB.accdb");
+    public DBWriter() throws SQLException, ClassNotFoundException {
+        Class.forName("org.h2.Driver");
+        this.conn = DriverManager.getConnection("jdbc:h2:~/test", "samiqureshi", "sq3147");
         
     }
     
     public boolean clearAllTables() throws SQLException{
         Statement s = conn.createStatement();
-        s.execute("DELETE * FROM [COURSE]");
-        s.execute("DELETE * FROM [COURSE_TIMESLOT]");
-        s.execute("DELETE * FROM [TEACHER]");
-        s.execute("DELETE * FROM [ROOM]");
-        s.execute("DELETE * FROM [STUDENT]");
-        s.execute("DELETE * FROM [STUDENT_COURSE]");
+        String temp = "DELETE FROM BATCH;";
+        s.execute(temp);
+//        s.execute("DELETE FROM [COURSE]");
+//        s.execute("DELETE FROM [COURSE_TIMESLOT]");
+//        s.execute("DELETE FROM [TEACHER]");
+//        s.execute("DELETE FROM [ROOM]");
+//        s.execute("DELETE FROM [STUDENT]");
+//        s.execute("DELETE * FROM [STUDENT_COURSE]");
         return true;
     }
     

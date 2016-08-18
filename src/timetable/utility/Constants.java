@@ -12,6 +12,10 @@ package timetable.utility;
  * @author Qureshi
  */
 public class Constants {
+    public static String BATCH_FILE_PATH = "CSBatches.xlsx";
+    public static String SCHEDULE_FILE_PATH = "CSTimeTableSpring2015.xlsx";
+    public static String ENROLMENT_FILE_PATH = "CSEnrolments.xlsx";
+    public static String COURSE_FILE_PATH = "CSCourseTeachers.xlsx";
     
 //    public static int NUMBER_OF_SHEETS = 1;
     public static String[] BATCHES = {"BLANK", "CS1A", "CS1B", "CS2A", "CS2B", "CS3", "CS4", "CS5", "CS6"};

@@ -6,12 +6,21 @@
 package timetable.handler;
 
 import java.util.ArrayList;
+import timetable.dal.DBWriter;
+import timetable.dal.FileReader;
+import timetable.translate.DBTranslator;
 
 /**
  *
  * @author SamiQureshi
  */
 public abstract class Handler {
-    public ArrayList<Integer> actionCode;
+    private ArrayList<Integer> actionCode;
+    public FileReader fileReader;
+//    private FileTranslator fileTranslator;
+    public DBTranslator dbTranslator;
+    public DBWriter dbWriter;
+    
+    
     public abstract boolean handleRequest(ArrayList<Integer> actionCode);
 }
