@@ -46,11 +46,14 @@ public class LoadHandler extends Handler{
                             dbTranslator.translateCourseInsertStatements(courseWorkbook);
                     ArrayList<String> studentInsertStatements = 
                             dbTranslator.translateStudentInsertStatements(enrolmentWorkbook);
+                    ArrayList<String> enrolmentInsertStatements = 
+                            dbTranslator.translateEnrolmentInsertStatements(enrolmentWorkbook);
                     dbWriter.clearAllTables();
                     dbWriter.runInsertStatements(batchInsertStatements);
                     dbWriter.runInsertStatements(teacherInsertStatements);
                     dbWriter.runInsertStatements(courseInsertStatements);
                     dbWriter.runInsertStatements(studentInsertStatements);
+                    dbWriter.runInsertStatements(enrolmentInsertStatements);
                     
                     
                     

@@ -47,6 +47,24 @@ public class DBReader {
         }
         return teacherID;
     }
+    public int getStudentNo(String studentID) throws SQLException{
+        Statement s = conn.createStatement();
+        int studentNo = 0;
+        ResultSet rs = s.executeQuery("SELECT STUDENT_NO FROM STUDENT WHERE STUDENT_ID = '" + studentID + "';");
+        if(rs.next()){
+            studentNo = rs.getInt(1);
+        }
+        return studentNo;
+    }
+    public int getCourseNo(String courseCode) throws SQLException{
+        Statement s = conn.createStatement();
+        int courseNo = 0;
+        ResultSet rs = s.executeQuery("SELECT COURSE_NO FROM COURSE WHERE COURSE_CODE = '" + courseCode + "';");
+        if(rs.next()){
+            courseNo = rs.getInt(1);
+        }
+        return courseNo;
+    }
 //    public boolean queryTest() throws SQLException {
 //        Statement s = conn.createStatement();
 //        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");

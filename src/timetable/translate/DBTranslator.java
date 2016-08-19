@@ -111,6 +111,28 @@ public class DBTranslator {
 
         return studentInsertStatements;
     }
+    public ArrayList<String> translateEnrolmentInsertStatements(XSSFWorkbook enrolmentWorkbook) throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
+        ArrayList<String> enrolmentInsertStatements = new ArrayList<>();
+        int j = 1;
+        for(int i = 0; i<enrolmentWorkbook.getNumberOfSheets(); i++){
+            String course = enrolmentWorkbook.getSheetName(i);
+            
+            for(Row row : enrolmentWorkbook.getSheetAt(i)){
+                String stmt = "INSERT INTO STUDENT_COURSE VALUES("
+                        + j
+                        + ", "
+                        + dbReader.getStudentNo(row.getCell(0).getStringCellValue())
+                        + ", "
+                        + dbReader.getCourseNo(course)
+                        +", NULL, NULL);";
+                enrolmentInsertStatements.add(stmt);
+                j++;
+            }
+        }
+
+        return enrolmentInsertStatements;
+    }
 
 //    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){
 //        ArrayList<String> instructions = new ArrayList<>();
