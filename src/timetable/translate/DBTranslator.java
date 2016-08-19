@@ -7,6 +7,7 @@ package timetable.translate;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -84,6 +85,33 @@ public class DBTranslator {
         }
         return courseInsertStatements;
     }
+    
+    public ArrayList<String> translateStudentInsertStatements(XSSFWorkbook enrolmentWorkbook) {
+        ArrayList<String> studentInsertStatements = new ArrayList<>();
+        HashMap<String, String> studentSet = new HashMap<>();
+        for(int i = 0; i<enrolmentWorkbook.getNumberOfSheets(); i++){
+            for(Row row : enrolmentWorkbook.getSheetAt(i)){
+                studentSet.put(row.getCell(0).toString(), row.getCell(1).toString());
+            }
+        }
+        int i = 1;
+        for(HashMap.Entry<String, String> entry : studentSet.entrySet()){
+            String stmt = "";
+            stmt = "INSERT INTO STUDENT VALUES("
+                    + i
+                    + ", '"
+                    + entry.getKey()
+                    + "', '"
+                    + entry.getValue()
+                    + "');";
+            studentInsertStatements.add(stmt);
+            i++;
+        }
+        
+
+        return studentInsertStatements;
+    }
+
 //    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){
 //        ArrayList<String> instructions = new ArrayList<>();
 //        for(int i=1; i<classrooms.length; i++){

@@ -37,7 +37,7 @@ public class FileReader {
         return workbook;
     }
     
-    public XSSFWorkbook readEnrolmentFile(int cno) throws IOException{
+    public XSSFWorkbook readEnrolmentFile() throws IOException{
         File file = new File(ENROLMENT_FILE_PATH);
         XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));
         return workbook;
