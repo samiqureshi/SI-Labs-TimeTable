@@ -33,9 +33,10 @@ public class DBWriter {
     public boolean clearAllTables() throws SQLException{
         Statement s = conn.createStatement();
         
+        s.execute("DELETE FROM COURSE;");
         s.execute("DELETE FROM BATCH;");
         s.execute("DELETE FROM TEACHER;");
-//        s.execute("DELETE FROM [COURSE]");
+        
 //        s.execute("DELETE FROM [COURSE_TIMESLOT]");
 //        s.execute("DELETE FROM [TEACHER]");
 //        s.execute("DELETE FROM [ROOM]");

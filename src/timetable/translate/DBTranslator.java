@@ -5,17 +5,21 @@
  */
 package timetable.translate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import timetable.dal.DBReader;
 
 /**
  *
  * @author Qureshi
  */
 public class DBTranslator {
+
+    public DBReader dbReader;
 
     public ArrayList<String> translateBatchInsertStatements(XSSFWorkbook batchWorkbook) {
         ArrayList<String> batchInsertStatements = new ArrayList<>();
@@ -52,11 +56,31 @@ public class DBTranslator {
         return teacherInsertStatements;
     }
 
-    public ArrayList<String> translateCourseInsertStatements(XSSFWorkbook courseWorkbook){
+    public ArrayList<String> translateCourseInsertStatements(XSSFWorkbook courseWorkbook) throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
         ArrayList<String> courseInsertStatements = new ArrayList<>();
         XSSFSheet courseSheet = courseWorkbook.getSheetAt(0);
-        for(Row row : courseSheet){
-            String stmt = "INSERT INTO COURSE VALUES(" + "";
+        for (Row row : courseSheet) {
+            String stmt = "";
+            if (row.getCell(4) != null) {
+                stmt = "INSERT INTO COURSE VALUES("
+                        + row.getCell(0).toString()
+                        + ", '" + row.getCell(1).getStringCellValue()
+                        + "', '" + row.getCell(2).getStringCellValue()
+                        + "', " + dbReader.getTeacherID(row.getCell(4).getStringCellValue())
+                        + ", "
+                        + dbReader.getBatchNo(row.getCell(3).getStringCellValue())
+                        + "); ";
+            } else {
+                stmt = "INSERT INTO COURSE VALUES("
+                        + row.getCell(0).toString()
+                        + ", '" + row.getCell(1).getStringCellValue()
+                        + "', '" + row.getCell(2).getStringCellValue() + "', NULL, "
+                        + dbReader.getBatchNo(row.getCell(3).getStringCellValue())
+                        + "); ";
+            }
+            courseInsertStatements.add(stmt);
+
         }
         return courseInsertStatements;
     }

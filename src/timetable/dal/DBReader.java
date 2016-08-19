@@ -37,6 +37,16 @@ public class DBReader {
         }
         return batchNo;
     }
+    
+    public int getTeacherID(String teacher) throws SQLException{
+        Statement s = conn.createStatement();
+        int teacherID = 0;
+        ResultSet rs = s.executeQuery("SELECT TEACHER_ID FROM TEACHER WHERE TEACHER_NAME = '" + teacher + "';");
+        if(rs.next()){
+            teacherID = rs.getInt(1);
+        }
+        return teacherID;
+    }
 //    public boolean queryTest() throws SQLException {
 //        Statement s = conn.createStatement();
 //        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");

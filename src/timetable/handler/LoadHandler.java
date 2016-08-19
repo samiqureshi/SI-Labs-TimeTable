@@ -46,6 +46,7 @@ public class LoadHandler extends Handler{
                     dbWriter.clearAllTables();
                     dbWriter.runInsertStatements(batchInsertStatements);
                     dbWriter.runInsertStatements(teacherInsertStatements);
+                    dbWriter.runInsertStatements(courseInsertStatements);
                     
                     
                     
@@ -68,6 +69,8 @@ public class LoadHandler extends Handler{
         } catch (IOException ex) {
             Logger.getLogger(LoadHandler.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
+            Logger.getLogger(LoadHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(LoadHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     return true;
