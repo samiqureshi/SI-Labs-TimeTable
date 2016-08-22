@@ -9,7 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import timetable.dal.DBReader;
@@ -37,17 +39,17 @@ public class DBTranslator {
     }
 
     public ArrayList<String> translateTeacherInsertStatements(XSSFWorkbook courseWorkbook) {
-        HashSet<String> teacherMap = new HashSet<>();
+        HashSet<String> teacherSet = new HashSet<>();
         ArrayList<String> teacherInsertStatements = new ArrayList<>();
         XSSFSheet courseSheet = courseWorkbook.getSheetAt(0);
 
         for (Row row : courseSheet) {
             if (row.getCell(4) != null) {
-                teacherMap.add(row.getCell(4).getStringCellValue());
+                teacherSet.add(row.getCell(4).getStringCellValue());
             }
         }
         int i = 1;
-        for (String teacher : teacherMap) {
+        for (String teacher : teacherSet) {
 
             String stmt = "INSERT INTO TEACHER VALUES (" + i + ", '" + teacher + "');";
             teacherInsertStatements.add(stmt);
@@ -85,17 +87,17 @@ public class DBTranslator {
         }
         return courseInsertStatements;
     }
-    
+
     public ArrayList<String> translateStudentInsertStatements(XSSFWorkbook enrolmentWorkbook) {
         ArrayList<String> studentInsertStatements = new ArrayList<>();
         HashMap<String, String> studentSet = new HashMap<>();
-        for(int i = 0; i<enrolmentWorkbook.getNumberOfSheets(); i++){
-            for(Row row : enrolmentWorkbook.getSheetAt(i)){
+        for (int i = 0; i < enrolmentWorkbook.getNumberOfSheets(); i++) {
+            for (Row row : enrolmentWorkbook.getSheetAt(i)) {
                 studentSet.put(row.getCell(0).toString(), row.getCell(1).toString());
             }
         }
         int i = 1;
-        for(HashMap.Entry<String, String> entry : studentSet.entrySet()){
+        for (HashMap.Entry<String, String> entry : studentSet.entrySet()) {
             String stmt = "";
             stmt = "INSERT INTO STUDENT VALUES("
                     + i
@@ -107,25 +109,25 @@ public class DBTranslator {
             studentInsertStatements.add(stmt);
             i++;
         }
-        
 
         return studentInsertStatements;
     }
+
     public ArrayList<String> translateEnrolmentInsertStatements(XSSFWorkbook enrolmentWorkbook) throws SQLException, ClassNotFoundException {
         dbReader = new DBReader();
         ArrayList<String> enrolmentInsertStatements = new ArrayList<>();
         int j = 1;
-        for(int i = 0; i<enrolmentWorkbook.getNumberOfSheets(); i++){
+        for (int i = 0; i < enrolmentWorkbook.getNumberOfSheets(); i++) {
             String course = enrolmentWorkbook.getSheetName(i);
-            
-            for(Row row : enrolmentWorkbook.getSheetAt(i)){
+
+            for (Row row : enrolmentWorkbook.getSheetAt(i)) {
                 String stmt = "INSERT INTO STUDENT_COURSE VALUES("
                         + j
                         + ", "
                         + dbReader.getStudentNo(row.getCell(0).getStringCellValue())
                         + ", "
                         + dbReader.getCourseNo(course)
-                        +", NULL, NULL);";
+                        + ", NULL, NULL);";
                 enrolmentInsertStatements.add(stmt);
                 j++;
             }
@@ -134,6 +136,68 @@ public class DBTranslator {
         return enrolmentInsertStatements;
     }
 
+    public ArrayList<String> translateRoomInsertStatements(XSSFWorkbook scheduleWorkbook) {
+        ArrayList<String> roomInsertStatements = new ArrayList<>();
+        HashSet<String> classroomSet = new HashSet<>();
+
+        for (Sheet semesterSheet : scheduleWorkbook) {
+            String temp = semesterSheet.getRow(3).getCell(1).getStringCellValue();
+            classroomSet.add(temp.substring(temp.indexOf("[") + 1,
+                    temp.indexOf("]")));
+            // Decide which rows to process
+            int rowStart = Math.min(6, semesterSheet.getFirstRowNum());
+            int rowEnd = Math.max(10, semesterSheet.getLastRowNum());
+
+            for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
+                Row r = semesterSheet.getRow(rowNum);
+                if (r == null) {
+                    // This whole row is empty
+                    // Handle it as needed
+                    continue;
+                }
+
+                int lastColumn = Math.max(r.getLastCellNum(), 9);
+
+                for (int cn = 0; cn < lastColumn; cn++) {
+                    Cell c = r.getCell(cn, Row.RETURN_BLANK_AS_NULL);
+                    if (c == null) {
+                        // The spreadsheet is empty in this cell
+                    } else {
+                        // Do something useful with the cell's contents
+                        String tempCell = c.getStringCellValue();
+                        String tempStr = "";
+                        if ((tempCell.contains("FF-"))) {
+                            tempStr = "FF-" + tempCell.split("FF-")[1].substring(0, 3);
+                            classroomSet.add(tempStr);
+                        }
+                        if ((tempCell.contains("GF-"))) {
+                            tempStr = "GF-" + tempCell.split("GF-")[1].substring(0, 3);
+                            classroomSet.add(tempStr);
+                        }
+                        if ((tempCell.contains("SF-"))) {
+                            tempStr = "SF-" + tempCell.split("SF-")[1].substring(0, 3);
+                            classroomSet.add(tempStr);
+                        }
+                        
+                    }
+                }
+            }
+
+        }
+        int i = 1;
+        for (String room : classroomSet) {
+            String stmt = "INSERT INTO ROOM VALUES (" + i + ", '" + room + "');"; 
+            roomInsertStatements.add(stmt);
+            i++;
+        }
+        return roomInsertStatements;
+    }
+
+    public ArrayList<String> translateScheduleInsertStatements(XSSFWorkbook scheduleWorkbook) {
+        ArrayList<String> scheduleInsertStatements = new ArrayList<>();
+
+        return scheduleInsertStatements;
+    }
 //    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){
 //        ArrayList<String> instructions = new ArrayList<>();
 //        for(int i=1; i<classrooms.length; i++){

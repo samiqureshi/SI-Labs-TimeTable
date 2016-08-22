@@ -38,6 +38,8 @@ public class DBWriter {
         s.execute("DELETE FROM BATCH;");
         s.execute("DELETE FROM TEACHER;");
         s.execute("DELETE FROM STUDENT;");
+        s.execute("DELETE FROM ROOM;");
+        
         
         
 //        s.execute("DELETE FROM [COURSE_TIMESLOT]");

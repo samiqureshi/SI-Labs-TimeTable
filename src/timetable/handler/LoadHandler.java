@@ -37,6 +37,7 @@ public class LoadHandler extends Handler{
                     XSSFWorkbook batchWorkbook = fileReader.readBatchFile();                    
                     XSSFWorkbook courseWorkbook = fileReader.readCourseFile();
                     XSSFWorkbook enrolmentWorkbook = fileReader.readEnrolmentFile();
+                    XSSFWorkbook scheduleWorkbook = fileReader.readScheduleFile();
                     
                     ArrayList<String> batchInsertStatements = 
                             dbTranslator.translateBatchInsertStatements(batchWorkbook);
@@ -48,12 +49,17 @@ public class LoadHandler extends Handler{
                             dbTranslator.translateStudentInsertStatements(enrolmentWorkbook);
                     ArrayList<String> enrolmentInsertStatements = 
                             dbTranslator.translateEnrolmentInsertStatements(enrolmentWorkbook);
+                    ArrayList<String> roomInsertStatements = 
+                            dbTranslator.translateRoomInsertStatements(scheduleWorkbook);
+                    ArrayList<String> scheduleInsertStatements = 
+                            dbTranslator.translateScheduleInsertStatements(scheduleWorkbook);
                     dbWriter.clearAllTables();
                     dbWriter.runInsertStatements(batchInsertStatements);
                     dbWriter.runInsertStatements(teacherInsertStatements);
                     dbWriter.runInsertStatements(courseInsertStatements);
                     dbWriter.runInsertStatements(studentInsertStatements);
                     dbWriter.runInsertStatements(enrolmentInsertStatements);
+                    dbWriter.runInsertStatements(roomInsertStatements);
                     
                     
                     
