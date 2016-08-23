@@ -9,12 +9,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import timetable.bo.CellStruct;
+import timetable.bo.CourseTimeSlotStruct;
+import timetable.bo.TableStruct;
 import timetable.dal.DBReader;
+import static timetable.utility.Constants.DAYS_PER_WEEK;
+import static timetable.utility.Constants.SLOTS_PER_DAY;
 
 /**
  *
@@ -148,7 +155,7 @@ public class DBTranslator {
             int rowStart = Math.min(6, semesterSheet.getFirstRowNum());
             int rowEnd = Math.max(10, semesterSheet.getLastRowNum());
 
-            for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
+            for (int rowNum = rowStart; rowNum <= rowEnd; rowNum++) {
                 Row r = semesterSheet.getRow(rowNum);
                 if (r == null) {
                     // This whole row is empty
@@ -193,9 +200,22 @@ public class DBTranslator {
         return roomInsertStatements;
     }
 
-    public ArrayList<String> translateScheduleInsertStatements(XSSFWorkbook scheduleWorkbook) {
+    public ArrayList<String> translateScheduleInsertStatements(XSSFWorkbook scheduleWorkbook) throws SQLException, ClassNotFoundException {
         ArrayList<String> scheduleInsertStatements = new ArrayList<>();
-
+        TableStruct semesterTables[] = new TableStruct[scheduleWorkbook.getNumberOfSheets()];
+        for(int i=0; i<scheduleWorkbook.getNumberOfSheets(); i++){
+            semesterTables[i] = new TableStruct(DAYS_PER_WEEK, SLOTS_PER_DAY);
+        }
+        ArrayList<CourseTimeSlotStruct> scheduleInfo = new ArrayList<>();
+        ScheduleTranslator schTranslator = new ScheduleTranslator();
+        
+//        workbook = schReader.read();
+        schTranslator.convertToTableStruct(scheduleWorkbook, semesterTables);
+        scheduleInfo = schTranslator.parseSchedule(semesterTables);
+        scheduleInsertStatements = schTranslator.convertToScheduleInsertStatements(
+                scheduleInfo);
+//        dbWriter.runInsertStatements(scheduleInsertStatements);
+ 
         return scheduleInsertStatements;
     }
 //    public ArrayList<String> convertToClassRoomInsertStatements(String[] classrooms){

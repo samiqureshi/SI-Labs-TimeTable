@@ -60,6 +60,7 @@ public class LoadHandler extends Handler{
                     dbWriter.runInsertStatements(studentInsertStatements);
                     dbWriter.runInsertStatements(enrolmentInsertStatements);
                     dbWriter.runInsertStatements(roomInsertStatements);
+                    dbWriter.runInsertStatements(scheduleInsertStatements);
                     
                     
                     

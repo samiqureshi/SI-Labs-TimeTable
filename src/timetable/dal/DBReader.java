@@ -65,6 +65,15 @@ public class DBReader {
         }
         return courseNo;
     }
+    public int getRoomNo(String roomName) throws SQLException{
+        Statement s = conn.createStatement();
+        int roomNo = 0;
+        ResultSet rs = s.executeQuery("SELECT ROOM_NO FROM ROOM WHERE ROOM_NAME = '" + roomName + "';");
+        if(rs.next()){
+            roomNo = rs.getInt(1);
+        }
+        return roomNo;
+    }
 //    public boolean queryTest() throws SQLException {
 //        Statement s = conn.createStatement();
 //        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");

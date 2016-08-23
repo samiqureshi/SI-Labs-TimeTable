@@ -5,6 +5,7 @@
  */
 package timetable.translate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -17,7 +18,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import timetable.bo.CellStruct;
 import timetable.bo.CourseTimeSlotStruct;
 import timetable.bo.TableStruct;
+import timetable.dal.DBReader;
 import timetable.utility.Constants;
+import static timetable.utility.Constants.DAYS_PER_WEEK;
+import static timetable.utility.Constants.SLOTS_PER_DAY;
 
 /**
  *
@@ -139,47 +143,52 @@ public class ScheduleTranslator {
         return true;
     }
 
-    public ArrayList<CourseTimeSlotStruct> parseSchedule(TableStruct[] semesterTables, ArrayList<String> courseList) {
+    public ArrayList<CourseTimeSlotStruct> parseSchedule(TableStruct[] semesterTables) throws SQLException, ClassNotFoundException {
 //        TableStruct[] temp = new TableStruct[semesterTables.length];
         ArrayList<CourseTimeSlotStruct> courseTimesList = new ArrayList<>();
         CourseTimeSlotStruct tempCTS;
+        DBReader dbReader = new DBReader();
 //        int temp = Constants.NUMBER_OF_SHEETS;
-        for (int i = 0; i < Constants.NUMBER_OF_SHEETS; i++) {
-            for (int j = 0; j < 5; j++) {
-                for (int k = 0; k < 8; k++) {
+        for (TableStruct semesterTable : semesterTables) {
+            for (int j = 0; j < DAYS_PER_WEEK; j++) {
+                for (int k = 0; k < SLOTS_PER_DAY; k++) {
                     tempCTS = new CourseTimeSlotStruct();
                     //Generating CourseCode
-                    if ((semesterTables[i].section.split(" ")[0].length()) == 4) {        //No sections in batch name i.e. CS-3
-                        if (!semesterTables[i].table[j][k].equals("")) {      //if not empty
-                            tempCTS.courseCode = semesterTables[i].table[j][k].split(" ")[0];
-                            if (semesterTables[i].table[j][k].contains(" L")) {  //if LAB ourse
+                    if ((semesterTable.section.split(" ")[0].length()) == 4) {
+                        //No sections in batch name i.e. CS-3
+                        if (!semesterTable.table[j][k].equals("")) {
+                            //if not empty
+                            tempCTS.courseCode = semesterTable.table[j][k].split(" ")[0];
+                            if (semesterTable.table[j][k].contains(" L")) {
+                                //if LAB ourse
                                 tempCTS.courseCode += "-L";
                             }
                         }
-                        if (!semesterTables[i].altTable[j][k].equals("")) {
-                            tempCTS.altCourseCode = semesterTables[i].altTable[j][k].split(" ")[0];
-                            if (semesterTables[i].altTable[j][k].contains(" L")) {
+                        if (!semesterTable.altTable[j][k].equals("")) {
+                            tempCTS.altCourseCode = semesterTable.altTable[j][k].split(" ")[0];
+                            if (semesterTable.altTable[j][k].contains(" L")) {
                                 tempCTS.altCourseCode += "-L";
                             }
                         }
-
-                    } else {      //Batch with sections i.e. CS-2A
-                        if (!semesterTables[i].table[j][k].equals("")) {      //if not empty
-                            tempCTS.courseCode = semesterTables[i].table[j][k].split(" ")[0] + semesterTables[i].section.charAt(4);
-                            if (semesterTables[i].table[j][k].contains(" L")) {  //if LAB course
+                    } else {
+                        //Batch with sections i.e. CS-2A
+                        if (!semesterTable.table[j][k].equals("")) {
+                            //if not empty
+                            tempCTS.courseCode = semesterTable.table[j][k].split(" ")[0] + semesterTable.section.charAt(4);
+                            if (semesterTable.table[j][k].contains(" L")) {
+                                //if LAB course
                                 tempCTS.courseCode += "-L";
-                                if (semesterTables[i].table[j][k].contains("SEC")) {
-                                    tempCTS.courseCode += semesterTables[i].table[j][k].split("SEC ")[1].charAt(1);
+                                if (semesterTable.table[j][k].contains("SEC")) {
+                                    tempCTS.courseCode += semesterTable.table[j][k].split("SEC ")[1].charAt(1);
                                 }
-
                             }
                         }
-                        if (!semesterTables[i].altTable[j][k].equals("")) {
-                            tempCTS.altCourseCode = semesterTables[i].altTable[j][k].split(" ")[0] + semesterTables[i].section.charAt(4);
-                            if (semesterTables[i].altTable[j][k].contains(" L")) {
+                        if (!semesterTable.altTable[j][k].equals("")) {
+                            tempCTS.altCourseCode = semesterTable.altTable[j][k].split(" ")[0] + semesterTable.section.charAt(4);
+                            if (semesterTable.altTable[j][k].contains(" L")) {
                                 tempCTS.altCourseCode += "-L";
-                                if (semesterTables[i].altTable[j][k].contains("SEC")) {
-                                    tempCTS.altCourseCode += semesterTables[i].altTable[j][k].split("SEC ")[1].charAt(1);
+                                if (semesterTable.altTable[j][k].contains("SEC")) {
+                                    tempCTS.altCourseCode += semesterTable.altTable[j][k].split("SEC ")[1].charAt(1);
                                 }
                             }
                         }
@@ -187,39 +196,36 @@ public class ScheduleTranslator {
                     //CourseCode to CourseNo
                     if (!tempCTS.courseCode.equals("") || !tempCTS.altCourseCode.equals("")) {
                         if (!tempCTS.courseCode.equals("")) {
-                            tempCTS.courseNo = courseList.indexOf(tempCTS.courseCode) + 1;
+//                            tempCTS.courseNo = courseList.indexOf(tempCTS.courseCode) + 1;
+                            tempCTS.courseNo = dbReader.getCourseNo(tempCTS.courseCode);
                         }
                         if (!tempCTS.altCourseCode.equals("")) {
-                            tempCTS.altCourseNo = courseList.indexOf(tempCTS.altCourseCode) + 1;
+                            tempCTS.altCourseNo = dbReader.getCourseNo(tempCTS.altCourseCode);
                         }
 
                     }
                     //Room Number(String) Extraction
-                    if ((semesterTables[i].table[j][k].contains("FF-"))
-                            || (semesterTables[i].table[j][k].contains("GF-"))
-                            || (semesterTables[i].table[j][k].contains("SF-"))) {
-                        if ((semesterTables[i].table[j][k].contains("FF-"))) {
-                            tempCTS.roomNoStr = "FF-" + semesterTables[i].table[j][k].split("FF-")[1].substring(0, 3);
+                    if ((semesterTable.table[j][k].contains("FF-")) || (semesterTable.table[j][k].contains("GF-")) || (semesterTable.table[j][k].contains("SF-"))) {
+                        if (semesterTable.table[j][k].contains("FF-")) {
+                            tempCTS.roomNoStr = "FF-" + semesterTable.table[j][k].split("FF-")[1].substring(0, 3);
                         }
-                        if ((semesterTables[i].table[j][k].contains("GF-"))) {
-                            tempCTS.roomNoStr = "GF-" + semesterTables[i].table[j][k].split("GF-")[1].substring(0, 3);
+                        if (semesterTable.table[j][k].contains("GF-")) {
+                            tempCTS.roomNoStr = "GF-" + semesterTable.table[j][k].split("GF-")[1].substring(0, 3);
                         }
-                        if ((semesterTables[i].table[j][k].contains("SF-"))) {
-                            tempCTS.roomNoStr = "SF-" + semesterTables[i].table[j][k].split("SF-")[1].substring(0, 3);
+                        if (semesterTable.table[j][k].contains("SF-")) {
+                            tempCTS.roomNoStr = "SF-" + semesterTable.table[j][k].split("SF-")[1].substring(0, 3);
                         }
-                        if ((semesterTables[i].altTable[j][k].contains("FF-"))) {
-                            tempCTS.altRoomNoStr = "FF-" + semesterTables[i].altTable[j][k].split("FF-")[1].substring(0, 3);
+                        if (semesterTable.altTable[j][k].contains("FF-")) {
+                            tempCTS.altRoomNoStr = "FF-" + semesterTable.altTable[j][k].split("FF-")[1].substring(0, 3);
                         }
-                        if ((semesterTables[i].altTable[j][k].contains("GF-"))) {
-                            tempCTS.altRoomNoStr = "GF-" + semesterTables[i].altTable[j][k].split("GF-")[1].substring(0, 3);
+                        if (semesterTable.altTable[j][k].contains("GF-")) {
+                            tempCTS.altRoomNoStr = "GF-" + semesterTable.altTable[j][k].split("GF-")[1].substring(0, 3);
                         }
-                        if ((semesterTables[i].altTable[j][k].contains("SF-"))) {
-                            tempCTS.altRoomNoStr = "SF-" + semesterTables[i].altTable[j][k].split("SF-")[1].substring(0, 3);
+                        if (semesterTable.altTable[j][k].contains("SF-")) {
+                            tempCTS.altRoomNoStr = "SF-" + semesterTable.altTable[j][k].split("SF-")[1].substring(0, 3);
                         }
                     } else {
-                        tempCTS.roomNoStr = semesterTables[i].section.substring(
-                                semesterTables[i].section.indexOf("[") + 1,
-                                semesterTables[i].section.indexOf("]"));
+                        tempCTS.roomNoStr = semesterTable.section.substring(semesterTable.section.indexOf("[") + 1, semesterTable.section.indexOf("]"));
 //                        tempCTS.altRoomNoStr = semesterTables[i].section.substring(
 //                                semesterTables[i].section.indexOf("[")+1, 
 //                                semesterTables[i].section.indexOf("]"));
@@ -227,21 +233,60 @@ public class ScheduleTranslator {
                     //Convert RoomNoStr to RoomNo int.
                     List<String> roomsList;
                     roomsList = Arrays.asList(Constants.CLASSROOMS);
-                    tempCTS.roomNo = roomsList.indexOf(tempCTS.roomNoStr);
+                    tempCTS.roomNo = dbReader.getRoomNo(tempCTS.roomNoStr);
                     if (!tempCTS.altCourseCode.equals("")) {
-                        tempCTS.altRoomNo = roomsList.indexOf(tempCTS.altRoomNoStr);
+                        tempCTS.altRoomNo = dbReader.getRoomNo(tempCTS.altRoomNoStr);
                     }
                     //Extract TimeSlot
                     int tempTimeSlot = (j) * 8 + k;
                     tempCTS.timeSlotNo = tempTimeSlot + 1;  //coz db starts at 1
-
                     courseTimesList.add(tempCTS);
                 }
             }
-
         }
 
         return courseTimesList;
+    }
+    
+    public ArrayList<String> convertToScheduleInsertStatements(ArrayList<CourseTimeSlotStruct> coursesTSInfo){ 
+        ArrayList<String> instructions = new ArrayList<>();
+        String tempCCode;
+        int i=0;
+        int index = 1;
+        while (i < coursesTSInfo.size()) {
+            if (!coursesTSInfo.get(i).courseCode.equals("")) {
+                String temp = "INSERT into COURSE_TIMESLOT VALUES ("
+                        + index + ", "
+                        + coursesTSInfo.get(i).courseNo + ", "
+                        + coursesTSInfo.get(i).timeSlotNo + ", "
+                        + coursesTSInfo.get(i).roomNo + ")";
+                instructions.add(temp);
+                index++;
+                
+                if (!coursesTSInfo.get(i).altCourseCode.equals("")) {
+                    temp = "INSERT into COURSE_TIMESLOT VALUES ("
+                            + index + ", "
+                            + coursesTSInfo.get(i).altCourseNo + ", "
+                            + coursesTSInfo.get(i).timeSlotNo + ", "
+                            + coursesTSInfo.get(i).altRoomNo + ")";
+                    instructions.add(temp);
+                    index++;
+                    i++;
+                }
+                
+            } 
+            i++;
+        }
+//        for (int i = 0; i < coursesTSInfo.size(); i++) {
+//            
+//
+//            
+//            
+//            
+//        }        
+        
+        
+        return instructions;
     }
 
 }
