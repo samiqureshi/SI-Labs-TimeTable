@@ -5,10 +5,15 @@
  */
 package timetable.handler;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author SamiQureshi
  */
 public class ViewHandler {
-    
+    public boolean handleRequest(ArrayList<Integer> actionCode){
+        
+        return true;
+    }
 }

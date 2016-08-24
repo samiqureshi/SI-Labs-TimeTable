@@ -16,6 +16,8 @@ import timetable.dal.DBReader;
  * @author SamiQureshi
  */
 public class QueryHandler extends Handler{
+    public ViewHandler viewHandler = new ViewHandler();
+    @Override
     public boolean handleRequest(ArrayList<Integer> actionCode) {
         try {
             dbReader = new DBReader();
@@ -37,18 +39,27 @@ public class QueryHandler extends Handler{
             }
             break;
 
-            case 2: {  //Get List of Students enrolled in a course
-                ArrayList<String> temp;
-
+            case 2: {  //Get Course Clashes i.e. list of courses having timing clashes with given course
+                ArrayList<Integer> temp = new ArrayList<>();
+                
                 try {
-                    temp = dbReader.getCourseEnrolments(actionCode.get(1));
+                    temp = dbReader.getCourseClashes(actionCode.get(1));
                 } catch (SQLException ex) {
                     Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            
             break;
 
-            case 3:
+            case 3: {   //Get List of courses having enrolment conflicts with the given course
+                ArrayList<String> temp = new ArrayList<>();
+                
+                try {
+                    temp = dbReader.getCourseConflicts(actionCode.get(1));
+                } catch (SQLException ex) {
+                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                 break;
           
                 

@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import static timetable.utility.Constants.CLASSROOMS;
 
@@ -65,6 +66,18 @@ public class DBReader {
         }
         return courseNo;
     }
+    
+    public String getCourseCode(int cno) throws SQLException{
+        Statement s = conn.createStatement();
+        String courseCode = new String();
+        ResultSet rs = s.executeQuery("SELECT COURSE_CODE FROM COURSE WHERE COURSE_NO = " + cno + ";");
+        if(rs.next()){
+            courseCode = rs.getString(1);
+        }
+        return courseCode;
+        
+    }
+    
     public int getRoomNo(String roomName) throws SQLException{
         Statement s = conn.createStatement();
         int roomNo = 0;
@@ -91,11 +104,11 @@ public class DBReader {
 
         for (int i = 1; i <= 40; i++) {
             ArrayList<String> tempResult = new ArrayList<>();
-            ResultSet rs = s.executeQuery("SELECT c.COURSE_NO, c.COURSE_CODE, r.ROOM_NAME "
-                    + "FROM COURSE_TIMESLOT ct "
-                    + "JOIN COURSE c ON ct.COURSE_NO_FK2 = c.COURSE_NO "
-                    + "JOIN ROOM r ON ct.ROOM_NO_FK = r.ROOM_NO "
-                    + "WHERE ct.TIMESLOT_NO_FK = " + i);
+            ResultSet rs = s.executeQuery("SELECT C.COURSE_NO, C.COURSE_CODE, R.ROOM_NAME "
+                    + "FROM COURSE_TIMESLOT CT "
+                    + "JOIN COURSE C ON CT.COURSE_NO_FK2 = C.COURSE_NO "
+                    + "JOIN ROOM R ON CT.ROOM_NO_FK = R.ROOM_NO "
+                    + "WHERE CT.TIMESLOT_NO_FK = " + i);
             while (rs.next()) {
                 
                 String temp;
@@ -117,6 +130,53 @@ public class DBReader {
             result.add(rs.getString(1));
         }
         return result;
+    }
+    
+    //Return list of courses having timing clashes with the argument
+    public ArrayList<Integer> getCourseClashes(int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<Integer> result = new ArrayList<>();
+        ResultSet rs = s.executeQuery("SELECT C.COURSE_NO "
+                + "FROM COURSE_TIMESLOT CT "
+                + "JOIN COURSE C ON CT.COURSE_NO_FK2 = C.COURSE_NO "
+                + "WHERE CT.TIMESLOT_NO_FK IN (SELECT TIMESLOT_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = " + cno + ") "
+                + "AND CT.COURSE_NO_FK2 <> " + cno + ";");
+        while (rs.next()) {
+            result.add(rs.getInt(1));
+        }
+        return result;
+    }
+    
+    public ArrayList<String> getCourseConflicts(int cno) throws SQLException{
+        ArrayList<String> result = new ArrayList<>();
+//        ArrayList<Integer> conflicts = new ArrayList<>();
+        ArrayList<Integer> clashes = getCourseClashes(cno);
+        for(int i = 0; i<clashes.size(); i++){
+            int clash = clashes.get(i);
+            float percentage = getCourseConflictPercentage(cno, clash);
+            if(percentage>0){
+//                conflicts.add(clash);
+                result.add(getCourseCode(clash) + " -> " + String.format("%.2f", percentage) + "%");
+            }
+        }
+        
+        
+        
+        return result;
+    }
+    
+    //Returns percentage of students enrolled in both given courses over total studnets in both (Intersection/Union)
+    public float getCourseConflictPercentage(int cno1, int cno2) throws SQLException {
+//        DataBaseReader dbReader = new DataBaseReader();
+        ArrayList<String> enrolments1 = getCourseEnrolments(cno1);
+        ArrayList<String> enrolments2 = getCourseEnrolments(cno2);
+        HashSet<String> studentSet = new HashSet<>();
+        studentSet.addAll(enrolments1);
+        studentSet.addAll(enrolments2);
+        float total = studentSet.size();
+        enrolments1.retainAll(enrolments2);
+        float common = enrolments1.size();
+        return (common * 100) / total;
     }
 
 //
@@ -188,6 +248,10 @@ public class DBReader {
 //        return ccode;
 //    }
 //    
+
+    public ArrayList<String> getCourseConflicts() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 
 }

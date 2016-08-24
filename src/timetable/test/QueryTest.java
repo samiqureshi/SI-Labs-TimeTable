@@ -18,7 +18,7 @@ public class QueryTest {
     public static void main(String[] args){
         Handler handler = new QueryHandler();
         ArrayList<Integer> actionCode = new ArrayList<>();
-        actionCode.add(2);
+        actionCode.add(3);
         actionCode.add(43);
         handler.handleRequest(actionCode);
     }
