@@ -84,30 +84,41 @@ public class DBReader {
 //        return true;
 //    }
 //
-//    public ArrayList<ArrayList<String>> queryAllClashes() throws SQLException {
-//        Statement s = conn.createStatement();
-//        
-//        ArrayList<ArrayList<String>> results = new ArrayList<>();
-//
-//        for (int i = 1; i <= 40; i++) {
-//            ArrayList<String> tempResult = new ArrayList<>();
-//            ResultSet rs = s.executeQuery("SELECT c.CCode, c.CName, r.RoomName "
-//                    + "FROM COURSE_TIMESLOT ct "
-//                    + "JOIN COURSE c ON ct.CNo_FK = c.CNo "
-//                    + "JOIN ROOM r ON ct.RoomNo_FK = r.RoomNo "
-//                    + "WHERE ct.TSNo_FK = " + i);
-//            while (rs.next()) {
-//                
-//                String temp;
-//                temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
-//                tempResult.add(temp);
-//            }
-//
-//            results.add(tempResult);
-//        }
-//        return results;
-//    }
-//
+    public ArrayList<ArrayList<String>> getAllClashes() throws SQLException {
+        Statement s = conn.createStatement();
+        
+        ArrayList<ArrayList<String>> results = new ArrayList<>();
+
+        for (int i = 1; i <= 40; i++) {
+            ArrayList<String> tempResult = new ArrayList<>();
+            ResultSet rs = s.executeQuery("SELECT c.COURSE_NO, c.COURSE_CODE, r.ROOM_NAME "
+                    + "FROM COURSE_TIMESLOT ct "
+                    + "JOIN COURSE c ON ct.COURSE_NO_FK2 = c.COURSE_NO "
+                    + "JOIN ROOM r ON ct.ROOM_NO_FK = r.ROOM_NO "
+                    + "WHERE ct.TIMESLOT_NO_FK = " + i);
+            while (rs.next()) {
+                
+                String temp;
+                temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
+                tempResult.add(temp);
+            }
+
+            results.add(tempResult);
+        }
+        return results;
+    }
+    
+    //Return list of Student IDs enrolled in the given course
+    public ArrayList<String> getCourseEnrolments(int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<String> result = new ArrayList<>();
+        ResultSet rs = s.executeQuery("SELECT S.STUDENT_NAME FROM STUDENT_COURSE SC JOIN STUDENT S ON SC.STUDENT_NO_FK = S.STUDENT_NO WHERE COURSE_NO_FK1 = " + cno + ";");
+        while (rs.next()) {
+            result.add(rs.getString(1));
+        }
+        return result;
+    }
+
 //
 //    //Return list of courses scheduled at the given timeslot
 //    public ArrayList<String> queryTimeSlotClashes(int tsno) throws SQLException {
@@ -177,15 +188,6 @@ public class DBReader {
 //        return ccode;
 //    }
 //    
-//    //Return list of Student IDs enrolled in the given course
-//    public ArrayList<String> queryCourseEnrolments(int cno) throws SQLException {
-//        Statement s = conn.createStatement();
-//        ArrayList<String> result = new ArrayList<>();
-//        ResultSet rs = s.executeQuery("SELECT SID_FK FROM STUDENT_COURSE WHERE CNo_FK = " + cno + ";");
-//        while(rs.next()){
-//            result.add(rs.getString(1));
-//        }
-//        return result;
-//    }
+
 
 }

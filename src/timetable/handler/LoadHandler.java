@@ -61,21 +61,7 @@ public class LoadHandler extends Handler{
                     dbWriter.runInsertStatements(enrolmentInsertStatements);
                     dbWriter.runInsertStatements(roomInsertStatements);
                     dbWriter.runInsertStatements(scheduleInsertStatements);
-                    
-                    
-                    
-                    break;
-                    
-                case 1:
-                    
-                    break;
-                    
-                case 2:
-                    break;
-                    
-                case 3:
-                    break;
-                    
+                 
                 default:
                     return false;
             }

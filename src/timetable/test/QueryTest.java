@@ -5,21 +5,21 @@
  */
 package timetable.test;
 
+
 import java.util.ArrayList;
 import timetable.handler.Handler;
-import timetable.handler.LoadHandler;
+import timetable.handler.QueryHandler;
 
 /**
  *
  * @author SamiQureshi
  */
-public class ReadAllFilesTest {
+public class QueryTest {
     public static void main(String[] args){
-        Handler handler = new LoadHandler();
+        Handler handler = new QueryHandler();
         ArrayList<Integer> actionCode = new ArrayList<>();
-        actionCode.add(0);
+        actionCode.add(2);
+        actionCode.add(43);
         handler.handleRequest(actionCode);
     }
-    
-    
 }
