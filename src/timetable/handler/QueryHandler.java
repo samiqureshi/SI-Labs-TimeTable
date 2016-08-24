@@ -51,7 +51,7 @@ public class QueryHandler extends Handler{
             
             break;
 
-            case 3: {   //Get List of courses having enrolment conflicts with the given course
+            case 3: {   //Get List of courses having enrolment conflicts (also timing clash) with the given course
                 ArrayList<String> temp = new ArrayList<>();
                 
                 try {
@@ -61,8 +61,35 @@ public class QueryHandler extends Handler{
                 }
             }
                 break;
-          
                 
+            case 4: {   //Get list of timeslots that have conflict
+                ArrayList<Integer> temp = new ArrayList<>();
+                for(int i=1; i<=40; i++){
+                    try {
+                        if(dbReader.isTimeslotConflicted(i)){
+                            temp.add(i);
+                        }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+                
+            }
+
+            break;
+
+            case 5:  {  //Is timeslot conflicted?
+                boolean temp = false;
+                try {
+                    temp = dbReader.isTimeslotConflicted(actionCode.get(1));
+                } catch (SQLException ex) {
+                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            break;
+
+
             default:
                 return false;
         }

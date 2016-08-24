@@ -12,8 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import static timetable.utility.Constants.CLASSROOMS;
 
 /**
  *
@@ -48,6 +46,7 @@ public class DBReader {
         }
         return teacherID;
     }
+    
     public int getStudentNo(String studentID) throws SQLException{
         Statement s = conn.createStatement();
         int studentNo = 0;
@@ -57,6 +56,7 @@ public class DBReader {
         }
         return studentNo;
     }
+    
     public int getCourseNo(String courseCode) throws SQLException{
         Statement s = conn.createStatement();
         int courseNo = 0;
@@ -87,16 +87,7 @@ public class DBReader {
         }
         return roomNo;
     }
-//    public boolean queryTest() throws SQLException {
-//        Statement s = conn.createStatement();
-//        ResultSet rs = s.executeQuery("SELECT [Time] FROM [TIMESLOT] WHERE Day like 'Wednesday'");
-//        while (rs.next()) {
-//            System.out.println(rs.getString(1));
-//
-//        }
-//        return true;
-//    }
-//
+
     public ArrayList<ArrayList<String>> getAllClashes() throws SQLException {
         Statement s = conn.createStatement();
         
@@ -132,14 +123,13 @@ public class DBReader {
         return result;
     }
     
-    //Return list of courses having timing clashes with the argument
+    //Return list of courses having timing clashes with the given course
     public ArrayList<Integer> getCourseClashes(int cno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<Integer> result = new ArrayList<>();
-        ResultSet rs = s.executeQuery("SELECT C.COURSE_NO "
-                + "FROM COURSE_TIMESLOT CT "
-                + "JOIN COURSE C ON CT.COURSE_NO_FK2 = C.COURSE_NO "
-                + "WHERE CT.TIMESLOT_NO_FK IN (SELECT TIMESLOT_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = " + cno + ") "
+        ResultSet rs = s.executeQuery("SELECT COURSE_NO_FK2 "
+                + "FROM COURSE_TIMESLOT "               
+                + "WHERE TIMESLOT_NO_FK IN (SELECT TIMESLOT_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = " + cno + ") "
                 + "AND CT.COURSE_NO_FK2 <> " + cno + ";");
         while (rs.next()) {
             result.add(rs.getInt(1));
@@ -147,16 +137,16 @@ public class DBReader {
         return result;
     }
     
+    //Return list of courses having an enrolment conflict (also timing clash) with given course
     public ArrayList<String> getCourseConflicts(int cno) throws SQLException{
         ArrayList<String> result = new ArrayList<>();
-//        ArrayList<Integer> conflicts = new ArrayList<>();
         ArrayList<Integer> clashes = getCourseClashes(cno);
         for(int i = 0; i<clashes.size(); i++){
             int clash = clashes.get(i);
             float percentage = getCourseConflictPercentage(cno, clash);
             if(percentage>0){
 //                conflicts.add(clash);
-                result.add(getCourseCode(clash) + " -> " + String.format("%.2f", percentage) + "%");
+                result.add(getCourseCode(clash) + " -> " + "");
             }
         }
         
@@ -165,9 +155,8 @@ public class DBReader {
         return result;
     }
     
-    //Returns percentage of students enrolled in both given courses over total studnets in both (Intersection/Union)
+    //Returns percentage of students enrolled in both given courses over total students in both (Intersection/Union)
     public float getCourseConflictPercentage(int cno1, int cno2) throws SQLException {
-//        DataBaseReader dbReader = new DataBaseReader();
         ArrayList<String> enrolments1 = getCourseEnrolments(cno1);
         ArrayList<String> enrolments2 = getCourseEnrolments(cno2);
         HashSet<String> studentSet = new HashSet<>();
@@ -179,24 +168,45 @@ public class DBReader {
         return (common * 100) / total;
     }
 
-//
-//    //Return list of courses scheduled at the given timeslot
-//    public ArrayList<String> queryTimeSlotClashes(int tsno) throws SQLException {
+    
+
+    //Return list of courses scheduled at the given timeslot
+//    public ArrayList<Integer> getTimeslotClashes(int tsno) throws SQLException {
 //        Statement s = conn.createStatement();
-//        ArrayList<String> result = new ArrayList<>();
+//        ArrayList<Integer> result = new ArrayList<>();
 //
-//        ResultSet rs = s.executeQuery("SELECT c.CNo, c.CCode, c.CName, r.RoomName "
-//                + "FROM COURSE_TIMESLOT ct "
-//                + "JOIN COURSE c ON ct.CNo_FK = c.CNo "
-//                + "JOIN ROOM r ON ct.RoomNo_FK = r.RoomNo "
-//                + "WHERE ct.TSNo_FK = " + tsno);
+//        ResultSet rs = s.executeQuery("SELECT COURSE_NO_FK2 "
+//                + "FROM COURSE_TIMESLOT "
+//                + "WHERE TIMESLOT_NO_FK = " + tsno + ";");
 //        while (rs.next()) {
-//            String temp;
-//            temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
-//            result.add(temp);
+//            result.add(rs.getInt(1));
 //        }
 //        return result;
 //    }
+//    
+    
+    public boolean isTimeslotConflicted(int tsno) throws SQLException {
+        Statement s = conn.createStatement();
+        ArrayList<Integer> timeslotCourses = new ArrayList<>();
+        ResultSet rs = s.executeQuery("SELECT COURSE_NO_FK2 "
+                + "FROM COURSE_TIMESLOT "
+                + "WHERE TIMESLOT_NO_FK = " + tsno + ";");
+        while (rs.next()) {
+            timeslotCourses.add(rs.getInt(1));
+        }
+        while(!timeslotCourses.isEmpty()){
+            int current = timeslotCourses.get(0);
+            timeslotCourses.remove(0);
+            for(int temp : timeslotCourses){
+                float pct = getCourseConflictPercentage(current, temp);
+                if(pct > 0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
 //
 //    //Return list of Course Numbers the given student is enrolled in
 //    public ArrayList<Integer> queryStudentCourses(String sid) throws SQLException {

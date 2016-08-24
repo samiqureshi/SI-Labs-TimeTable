@@ -18,8 +18,8 @@ public class QueryTest {
     public static void main(String[] args){
         Handler handler = new QueryHandler();
         ArrayList<Integer> actionCode = new ArrayList<>();
-        actionCode.add(3);
-        actionCode.add(43);
+        actionCode.add(5);
+        actionCode.add(34);
         handler.handleRequest(actionCode);
     }
 }
