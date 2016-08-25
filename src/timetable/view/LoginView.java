@@ -30,6 +30,9 @@ import javafx.stage.Stage;
  * @author SamiQureshi
  */
 public class LoginView extends Application {
+    Button loginBtn;
+//    Button 
+    
 
     @Override
     public void start(Stage primaryStage) {
@@ -74,10 +77,12 @@ public class LoginView extends Application {
 //                actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setId("actiontarget");
                 actiontarget.setText("Sign in button pressed");
+                
             }
         });
 
         Scene scene = new Scene(grid, 600, 500);
+
         primaryStage.setScene(scene);
 
         scene.getStylesheets().add(LoginView.class.getResource("LoginView.css").toExternalForm());

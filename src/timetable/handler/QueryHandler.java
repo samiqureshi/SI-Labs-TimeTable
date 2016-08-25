@@ -15,84 +15,41 @@ import timetable.dal.DBReader;
  *
  * @author SamiQureshi
  */
-public class QueryHandler extends Handler{
-    public ViewHandler viewHandler = new ViewHandler();
-    @Override
-    public boolean handleRequest(ArrayList<Integer> actionCode) {
-        try {
-            dbReader = new DBReader();
-        } catch (SQLException ex) {
-            Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+public class QueryHandler extends Handler {
 
-        switch (actionCode.get(0)) {
-            case 1: {
-                ArrayList<ArrayList<String>> temp;
-                try {
-                    //Get List of clashing courses for each of 40 timeslots i.e. List of Lists
-                    temp = dbReader.getAllClashes();
-                } catch (SQLException ex) {
-                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            break;
-
-            case 2: {  //Get Course Clashes i.e. list of courses having timing clashes with given course
-                ArrayList<Integer> temp = new ArrayList<>();
-                
-                try {
-                    temp = dbReader.getCourseClashes(actionCode.get(1));
-                } catch (SQLException ex) {
-                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            break;
-
-            case 3: {   //Get List of courses having enrolment conflicts (also timing clash) with the given course
-                ArrayList<String> temp = new ArrayList<>();
-                
-                try {
-                    temp = dbReader.getCourseConflicts(actionCode.get(1));
-                } catch (SQLException ex) {
-                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-                break;
-                
-            case 4: {   //Get list of timeslots that have conflict
-                ArrayList<Integer> temp = new ArrayList<>();
-                for(int i=1; i<=40; i++){
-                    try {
-                        if(dbReader.isTimeslotConflicted(i)){
-                            temp.add(i);
-                        }
-                    } catch (SQLException ex) {
-                        Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                
-                
-            }
-
-            break;
-
-            case 5:  {  //Is timeslot conflicted?
-                boolean temp = false;
-                try {
-                    temp = dbReader.isTimeslotConflicted(actionCode.get(1));
-                } catch (SQLException ex) {
-                    Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            break;
-
-
-            default:
-                return false;
-        }
-        return true;
+    //Get List of 40 Lists showing overall scheduled courses of the week
+    public ArrayList<ArrayList<String>> getAllClashes() throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
+        return dbReader.getAllClashes();
     }
+
+    //Get List of all courses having enrolment conflict AND timing clash with given course
+    public ArrayList<String> getCourseConflicts(int cno) throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
+        return dbReader.getCourseConflicts(cno);
+    }
+
+    //Get list of all timeslots that have courses with enrolment conflict
+    public ArrayList<String> getConflictedTimeslots() throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
+        ArrayList<Integer> conflicts = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 1; i <= 40; i++) {
+            try {
+                if (dbReader.isTimeslotConflicted(i)) {
+                    conflicts.add(i);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(QueryHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        int dummy = 0;
+        for(Integer i : conflicts){
+            result.add(dbReader.getTimeslot(i));
+        }
+
+        return result;
+    }
+
 }

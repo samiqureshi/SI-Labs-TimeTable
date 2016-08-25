@@ -5,6 +5,13 @@
  */
 package timetable.controller;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import timetable.handler.Handler;
+import timetable.handler.LoadHandler;
+import timetable.handler.QueryHandler;
+
 
 
 /**
@@ -12,13 +19,43 @@ package timetable.controller;
  * @author Qureshi
  */
 public class Controller {
+//    Handler handler;
     
-
-    
-
-
     public Controller(){
+//        handler = new Handler();
+    }
+    
+    public boolean handleRequest(ArrayList<Integer> actionCode) throws SQLException, ClassNotFoundException, IOException{
+        int code = actionCode.get(0);
+        int arg1 = actionCode.get(1);
+        int arg2 = actionCode.get(2);
+        LoadHandler loadHandler;
+        QueryHandler queryHandler;
         
+        switch(code){
+            case 0:     //Load all files
+                loadHandler = new LoadHandler();
+                loadHandler.loadAllFiles();
+                break;
+                
+            case 1:     //Get All Clashes
+                queryHandler = new QueryHandler();
+                System.out.println(queryHandler.getAllClashes());
+                break;
+                
+            case 2:     //Get all conflicting courses with arg1
+                queryHandler = new QueryHandler();
+                System.out.println(queryHandler.getCourseConflicts(arg1));
+                break;
+                
+            case 3:     //Get all timeslots which have conflicts
+                queryHandler = new QueryHandler();
+                System.out.println(queryHandler.getConflictedTimeslots());
+                break;
+        }
+        
+        
+        return true;
     }
 //
 //    //Admin

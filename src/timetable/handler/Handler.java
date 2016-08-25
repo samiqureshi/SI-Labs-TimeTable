@@ -15,7 +15,7 @@ import timetable.translate.DBTranslator;
  *
  * @author SamiQureshi
  */
-public abstract class Handler {
+public class Handler {
     private ArrayList<Integer> actionCode;
     public FileReader fileReader;
 //    private FileTranslator fileTranslator;
@@ -24,5 +24,7 @@ public abstract class Handler {
     public DBReader dbReader;
     
     
-    public abstract boolean handleRequest(ArrayList<Integer> actionCode);
+//    public abstract boolean handleRequest(ArrayList<Integer> actionCode);
+
+   
 }

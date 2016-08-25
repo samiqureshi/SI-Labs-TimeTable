@@ -36,6 +36,17 @@ public class DBReader {
         }
         return batchNo;
     }
+    public String getTimeslot(int tsno) throws SQLException{
+        Statement s = conn.createStatement();
+        String timeslot = "";
+        ResultSet rs = s.executeQuery("SELECT TIME, DAY_OF_WEEK FROM TIMESLOT WHERE TIMESLOT_NO = '" + tsno + "';");
+        
+        while(rs.next()){
+            timeslot = rs.getString(1);
+            timeslot += " " + rs.getString(2);
+        }
+        return timeslot;
+    }
     
     public int getTeacherID(String teacher) throws SQLException{
         Statement s = conn.createStatement();
@@ -130,7 +141,7 @@ public class DBReader {
         ResultSet rs = s.executeQuery("SELECT COURSE_NO_FK2 "
                 + "FROM COURSE_TIMESLOT "               
                 + "WHERE TIMESLOT_NO_FK IN (SELECT TIMESLOT_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = " + cno + ") "
-                + "AND CT.COURSE_NO_FK2 <> " + cno + ";");
+                + "AND COURSE_NO_FK2 <> " + cno + ";");
         while (rs.next()) {
             result.add(rs.getInt(1));
         }
@@ -146,7 +157,7 @@ public class DBReader {
             float percentage = getCourseConflictPercentage(cno, clash);
             if(percentage>0){
 //                conflicts.add(clash);
-                result.add(getCourseCode(clash) + " -> " + "");
+                result.add(getCourseCode(clash) + " -> " + String.format("%.2f", percentage) + "%");
             }
         }
         

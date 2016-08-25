@@ -5,7 +5,10 @@
  */
 package timetable.test;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import timetable.controller.Controller;
 import timetable.handler.Handler;
 import timetable.handler.LoadHandler;
 
@@ -14,11 +17,14 @@ import timetable.handler.LoadHandler;
  * @author SamiQureshi
  */
 public class LoadAllFilesTest {
-    public static void main(String[] args){
-        Handler handler = new LoadHandler();
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException{
+        Controller controller = new Controller();
+
         ArrayList<Integer> actionCode = new ArrayList<>();
         actionCode.add(0);
-        handler.handleRequest(actionCode);
+        actionCode.add(0);
+        actionCode.add(0);
+        controller.handleRequest(actionCode);
     }
     
     
