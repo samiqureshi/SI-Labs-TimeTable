@@ -36,7 +36,7 @@ public class Controller {
             case 0:     //Load all files
                 loadHandler = new LoadHandler();
                 loadHandler.loadAllFiles();
-                break;
+                return true;
                 
             case 1:     //Get All Clashes
                 queryHandler = new QueryHandler();

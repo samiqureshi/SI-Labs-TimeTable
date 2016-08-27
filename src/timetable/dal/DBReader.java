@@ -123,6 +123,18 @@ public class DBReader {
         return results;
     }
     
+    public ArrayList<String> getCourseList() throws SQLException{
+        Statement s = conn.createStatement();
+        ArrayList<String> result = new ArrayList<>();
+        ResultSet rs = s.executeQuery("SELECT COURSE_CODE, COURSE_NAME "
+                + "FROM COURSE "
+                + "ORDER BY COURSE_NAME ASC;");
+        while (rs.next()) {
+            result.add(rs.getString(1) + " : " + rs.getString(2));
+        }
+        
+        return result;
+    }
     //Return list of Student IDs enrolled in the given course
     public ArrayList<String> getCourseEnrolments(int cno) throws SQLException {
         Statement s = conn.createStatement();

@@ -28,6 +28,11 @@ public class QueryHandler extends Handler {
         dbReader = new DBReader();
         return dbReader.getCourseConflicts(cno);
     }
+    //Get Courses List
+    public ArrayList<String> getCourseList() throws SQLException, ClassNotFoundException {
+        dbReader = new DBReader();
+        return dbReader.getCourseList();
+    }
 
     //Get list of all timeslots that have courses with enrolment conflict
     public ArrayList<String> getConflictedTimeslots() throws SQLException, ClassNotFoundException {
@@ -44,7 +49,6 @@ public class QueryHandler extends Handler {
             }
         }
 
-        int dummy = 0;
         for(Integer i : conflicts){
             result.add(dbReader.getTimeslot(i));
         }
