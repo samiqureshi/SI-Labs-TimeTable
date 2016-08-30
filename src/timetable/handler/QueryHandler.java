@@ -56,4 +56,10 @@ public class QueryHandler extends Handler {
         return result;
     }
 
+    public String getRoom(String courseCode) throws SQLException, ClassNotFoundException{
+        dbReader = new DBReader();
+        int cno = dbReader.getCourseNo(courseCode);
+        int roomNo = dbReader.getCourseRoomNo(cno);
+        return dbReader.getRoom(roomNo);
+    }
 }

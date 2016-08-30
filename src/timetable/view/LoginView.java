@@ -45,12 +45,15 @@ public class LoginView extends Application {
     Controller controller;
     QueryHandler queryHandler;
     ArrayList<String> list;
-    Button loginBtn, courseBtn;
-    HBox hbLoginBtn, hbCourseBtn;
+    String courseCode, courseRoom;
+    ArrayList<ArrayList<String>> lists;
+    ArrayList<Label> scheduledTimeslots;
+    Button loginBtn, getConflictsBtn;
+    HBox hbLoginBtn, hbCourseBtn, hbResultTitle;
     Stage theStage;
     GridPane loginGrid, homeGrid;
     Text welcomeTitle;
-    Label usrLabel, pwdLabel, cnoLabel, courseResultLabel;
+    Label usrLabel, pwdLabel, cnoLabel, courseInfoTitle, courseInfoRoom, courseInfoTimings;
     Label timeslot1, timeslot2, timeslot3, timeslot4, timeslot5, timeslot6, timeslot7, timeslot8;
     Label monday, tuesday, wednesday, thursday, friday;
     TextField userTextField, courseTextField;
@@ -103,35 +106,35 @@ public class LoginView extends Application {
 //        homeGrid.gridLinesVisibleProperty().set(true);
         homeGrid.setHgap(10);
         homeGrid.setVgap(10);
-        homeGrid.setPadding(new Insets(25, 25, 25, 25));
+        homeGrid.setPadding(new Insets(10, 10, 10, 10));
         cnoLabel = new Label("Select Course:");
         homeGrid.add(cnoLabel, 0, 1);
         list = queryHandler.getCourseList();
         courseList = FXCollections.observableArrayList(list);
         courseMenu = new ComboBox(courseList);
         homeGrid.add(courseMenu, 1, 1);
-        courseBtn = new Button("Get Conflicts");
+        getConflictsBtn = new Button("Get Conflicts");
         hbCourseBtn = new HBox(10);
-        hbCourseBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbCourseBtn.setAlignment(Pos.BASELINE_LEFT);
         hbCourseBtn.getChildren().add(cnoLabel);
         hbCourseBtn.getChildren().add(courseMenu);
-        hbCourseBtn.getChildren().add(courseBtn);
-        homeGrid.add(hbCourseBtn, 2, 1, 13, 1);
-        courseBtn.setOnAction(e -> {
+        hbCourseBtn.getChildren().add(getConflictsBtn);
+        homeGrid.add(hbCourseBtn, 2, 1, 16, 1);
+        getConflictsBtn.setOnAction(e -> {
             try {
                 ButtonClicked(e);
             } catch (SQLException | ClassNotFoundException | IOException ex) {
                 Logger.getLogger(LoginView.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         //Top Separator
-        final Separator sepTop = new Separator();
-        sepTop.setValignment(VPos.CENTER);
-        homeGrid.setConstraints(sepTop, 1, 6);
-        homeGrid.setColumnSpan(sepTop, 17);
-        homeGrid.getChildren().add(sepTop);
-                       
+        final Separator topSep = new Separator();
+        topSep.setValignment(VPos.CENTER);
+        homeGrid.setConstraints(topSep, 1, 6);
+        homeGrid.setColumnSpan(topSep, 17);
+        homeGrid.getChildren().add(topSep);
+
         //Horizontal Separator 1
         final Separator hSep1 = new Separator();
         hSep1.setValignment(VPos.CENTER);
@@ -156,22 +159,22 @@ public class LoginView extends Application {
         homeGrid.setConstraints(hSep4, 1, 14);
         homeGrid.setColumnSpan(hSep4, 17);
         homeGrid.getChildren().add(hSep4);
-        
+
         //Bottom Separator
-        final Separator sepBottom = new Separator();
-        sepBottom.setValignment(VPos.CENTER);
-        homeGrid.setConstraints(sepBottom, 1, 16);
-        homeGrid.setColumnSpan(sepBottom, 17);
-        homeGrid.getChildren().add(sepBottom);
-        
+        final Separator bottomSep = new Separator();
+        bottomSep.setValignment(VPos.CENTER);
+        homeGrid.setConstraints(bottomSep, 1, 16);
+        homeGrid.setColumnSpan(bottomSep, 17);
+        homeGrid.getChildren().add(bottomSep);
+
         //Left Separator
-        final Separator sepLeft = new Separator();
-        sepLeft.setOrientation(Orientation.VERTICAL);
-        sepLeft.setHalignment(HPos.CENTER);
-        homeGrid.setConstraints(sepLeft, 1, 6);
-        homeGrid.setRowSpan(sepLeft, 11);
-        homeGrid.getChildren().add(sepLeft);        
-        
+        final Separator LeftSep = new Separator();
+        LeftSep.setOrientation(Orientation.VERTICAL);
+        LeftSep.setHalignment(HPos.CENTER);
+        homeGrid.setConstraints(LeftSep, 1, 6);
+        homeGrid.setRowSpan(LeftSep, 11);
+        homeGrid.getChildren().add(LeftSep);
+
         //Vertical Seperator 1
         final Separator vSep1 = new Separator();
         vSep1.setOrientation(Orientation.VERTICAL);
@@ -222,14 +225,12 @@ public class LoginView extends Application {
         homeGrid.setRowSpan(vSep7, 11);
         homeGrid.getChildren().add(vSep7);
         //Right Separator
-        final Separator sepRight = new Separator();
-        sepRight.setOrientation(Orientation.VERTICAL);
-        sepRight.setHalignment(HPos.CENTER);
-        homeGrid.setConstraints(sepRight, 17, 6);
-        homeGrid.setRowSpan(sepRight, 11);
-        homeGrid.getChildren().add(sepRight);
-        
-        
+        final Separator rightSep = new Separator();
+        rightSep.setOrientation(Orientation.VERTICAL);
+        rightSep.setHalignment(HPos.CENTER);
+        homeGrid.setConstraints(rightSep, 17, 6);
+        homeGrid.setRowSpan(rightSep, 11);
+        homeGrid.getChildren().add(rightSep);
 
         timeslot1 = new Label("9:00 - 10:00");
         timeslot2 = new Label("10:00 - 11:00");
@@ -258,6 +259,70 @@ public class LoginView extends Application {
         homeGrid.add(thursday, 0, 13);
         homeGrid.add(friday, 0, 15);
 
+        //Filling up the table
+        scheduledTimeslots = new ArrayList<>();
+        
+
+        String temp = new String();
+        lists = queryHandler.getAllClashes();
+        for (int i = 0; i < 40; i++) {
+            temp = "";
+            list = lists.get(i);
+            for (String course : list) {
+                temp += course + "\n";
+
+            }
+            scheduledTimeslots.add(new Label(temp));
+        }
+        for (Label label : scheduledTimeslots) {
+            label.setId("cell-text");
+        }
+
+        homeGrid.add(scheduledTimeslots.get(0), 2, 7);
+        homeGrid.add(scheduledTimeslots.get(1), 4, 7);
+        homeGrid.add(scheduledTimeslots.get(2), 6, 7);
+        homeGrid.add(scheduledTimeslots.get(3), 8, 7);
+        homeGrid.add(scheduledTimeslots.get(4), 10, 7);
+        homeGrid.add(scheduledTimeslots.get(5), 12, 7);
+        homeGrid.add(scheduledTimeslots.get(6), 14, 7);
+        homeGrid.add(scheduledTimeslots.get(7), 16, 7);
+
+        homeGrid.add(scheduledTimeslots.get(8), 2, 9);
+        homeGrid.add(scheduledTimeslots.get(9), 4, 9);
+        homeGrid.add(scheduledTimeslots.get(10), 6, 9);
+        homeGrid.add(scheduledTimeslots.get(11), 8, 9);
+        homeGrid.add(scheduledTimeslots.get(12), 10, 9);
+        homeGrid.add(scheduledTimeslots.get(13), 12, 9);
+        homeGrid.add(scheduledTimeslots.get(14), 14, 9);
+        homeGrid.add(scheduledTimeslots.get(15), 16, 9);
+
+        homeGrid.add(scheduledTimeslots.get(16), 2, 11);
+        homeGrid.add(scheduledTimeslots.get(17), 4, 11);
+        homeGrid.add(scheduledTimeslots.get(18), 6, 11);
+        homeGrid.add(scheduledTimeslots.get(19), 8, 11);
+        homeGrid.add(scheduledTimeslots.get(20), 10, 11);
+        homeGrid.add(scheduledTimeslots.get(21), 12, 11);
+        homeGrid.add(scheduledTimeslots.get(22), 14, 11);
+        homeGrid.add(scheduledTimeslots.get(23), 16, 11);
+
+        homeGrid.add(scheduledTimeslots.get(24), 2, 13);
+        homeGrid.add(scheduledTimeslots.get(25), 4, 13);
+        homeGrid.add(scheduledTimeslots.get(26), 6, 13);
+        homeGrid.add(scheduledTimeslots.get(27), 8, 13);
+        homeGrid.add(scheduledTimeslots.get(28), 10, 13);
+        homeGrid.add(scheduledTimeslots.get(29), 12, 13);
+        homeGrid.add(scheduledTimeslots.get(30), 14, 13);
+        homeGrid.add(scheduledTimeslots.get(31), 16, 13);
+
+        homeGrid.add(scheduledTimeslots.get(32), 2, 15);
+        homeGrid.add(scheduledTimeslots.get(33), 4, 15);
+        homeGrid.add(scheduledTimeslots.get(34), 6, 15);
+        homeGrid.add(scheduledTimeslots.get(35), 8, 15);
+        homeGrid.add(scheduledTimeslots.get(36), 10, 15);
+        homeGrid.add(scheduledTimeslots.get(37), 12, 15);
+        homeGrid.add(scheduledTimeslots.get(38), 14, 15);
+        homeGrid.add(scheduledTimeslots.get(39), 16, 15);
+
         homeScene = new Scene(homeGrid, 1000, 600);
 
         primaryStage.setScene(loginScene);
@@ -278,14 +343,27 @@ public class LoginView extends Application {
                 theStage.setScene(homeScene);
             }
 
-        } else if (e.getSource() == courseBtn) {
-            homeGrid.getChildren().remove(courseResultLabel);
+        } else if (e.getSource() == getConflictsBtn) {
+            homeGrid.getChildren().remove(courseInfoTitle);
+            homeGrid.getChildren().remove(courseInfoRoom);
+//            hbResultTitle = new HBox();
             if (courseMenu.getValue() == null) {
-                courseResultLabel = new Label("Please choose a course.");
+                courseInfoTitle = new Label("Please choose a course.");
             } else {
-                courseResultLabel = new Label(courseMenu.getValue().toString());
+                courseInfoTitle = new Label(courseMenu.getValue().toString());
+                courseCode = courseMenu.getValue().toString().split(" ")[0];
+                courseRoom = queryHandler.getRoom(courseCode);
+                courseInfoRoom = new Label("Room: " + courseRoom);
+                
+                
+                courseInfoTitle.setId("course-info-title");
+                courseInfoRoom.setId("course-info-room");
+//            hbResultTitle.setAlignment(Pos.CENTER);
+//            hbResultTitle.getChildren().add(courseInfoTitle);
+                homeGrid.add(courseInfoTitle, 18, 7);
+                homeGrid.add(courseInfoRoom, 18, 8);
+
             }
-            homeGrid.add(courseResultLabel, 3, 4);
 
         }
     }

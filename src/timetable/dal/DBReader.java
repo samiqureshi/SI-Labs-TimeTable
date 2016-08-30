@@ -26,95 +26,117 @@ public class DBReader {
         this.conn = DriverManager.getConnection("jdbc:h2:~/test", "samiqureshi", "sq3147");
     }
 
-    public int getBatchNo(String batch) throws SQLException{
+    public int getBatchNo(String batch) throws SQLException {
         Statement s = conn.createStatement();
         int batchNo = 0;
         ResultSet rs = s.executeQuery("SELECT BATCH_NO FROM BATCH WHERE BATCH_NAME = '" + batch + "';");
-        
-        if(rs.next()){
+
+        if (rs.next()) {
             batchNo = rs.getInt(1);
         }
         return batchNo;
     }
-    public String getTimeslot(int tsno) throws SQLException{
+
+    public String getTimeslot(int tsno) throws SQLException {
         Statement s = conn.createStatement();
         String timeslot = "";
         ResultSet rs = s.executeQuery("SELECT TIME, DAY_OF_WEEK FROM TIMESLOT WHERE TIMESLOT_NO = '" + tsno + "';");
-        
-        while(rs.next()){
+
+        while (rs.next()) {
             timeslot = rs.getString(1);
             timeslot += " " + rs.getString(2);
         }
         return timeslot;
     }
-    
-    public int getTeacherID(String teacher) throws SQLException{
-        Statement s = conn.createStatement();
-        int teacherID = 0;
-        ResultSet rs = s.executeQuery("SELECT TEACHER_ID FROM TEACHER WHERE TEACHER_NAME = '" + teacher + "';");
-        if(rs.next()){
-            teacherID = rs.getInt(1);
-        }
-        return teacherID;
-    }
-    
-    public int getStudentNo(String studentID) throws SQLException{
-        Statement s = conn.createStatement();
-        int studentNo = 0;
-        ResultSet rs = s.executeQuery("SELECT STUDENT_NO FROM STUDENT WHERE STUDENT_ID = '" + studentID + "';");
-        if(rs.next()){
-            studentNo = rs.getInt(1);
-        }
-        return studentNo;
-    }
-    
-    public int getCourseNo(String courseCode) throws SQLException{
-        Statement s = conn.createStatement();
-        int courseNo = 0;
-        ResultSet rs = s.executeQuery("SELECT COURSE_NO FROM COURSE WHERE COURSE_CODE = '" + courseCode + "';");
-        if(rs.next()){
-            courseNo = rs.getInt(1);
-        }
-        return courseNo;
-    }
-    
-    public String getCourseCode(int cno) throws SQLException{
-        Statement s = conn.createStatement();
-        String courseCode = new String();
-        ResultSet rs = s.executeQuery("SELECT COURSE_CODE FROM COURSE WHERE COURSE_NO = " + cno + ";");
-        if(rs.next()){
-            courseCode = rs.getString(1);
-        }
-        return courseCode;
-        
-    }
-    
-    public int getRoomNo(String roomName) throws SQLException{
+
+    public int getCourseRoomNo(int cno) throws SQLException {
         Statement s = conn.createStatement();
         int roomNo = 0;
-        ResultSet rs = s.executeQuery("SELECT ROOM_NO FROM ROOM WHERE ROOM_NAME = '" + roomName + "';");
+        ResultSet rs = s.executeQuery("SELECT ROOM_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = '" + cno + "';");
+
         if(rs.next()){
             roomNo = rs.getInt(1);
         }
         return roomNo;
     }
 
+    public int getTeacherID(String teacher) throws SQLException {
+        Statement s = conn.createStatement();
+        int teacherID = 0;
+        ResultSet rs = s.executeQuery("SELECT TEACHER_ID FROM TEACHER WHERE TEACHER_NAME = '" + teacher + "';");
+        if (rs.next()) {
+            teacherID = rs.getInt(1);
+        }
+        return teacherID;
+    }
+
+    public int getStudentNo(String studentID) throws SQLException {
+        Statement s = conn.createStatement();
+        int studentNo = 0;
+        ResultSet rs = s.executeQuery("SELECT STUDENT_NO FROM STUDENT WHERE STUDENT_ID = '" + studentID + "';");
+        if (rs.next()) {
+            studentNo = rs.getInt(1);
+        }
+        return studentNo;
+    }
+
+    public int getCourseNo(String courseCode) throws SQLException {
+        Statement s = conn.createStatement();
+        int courseNo = 0;
+        ResultSet rs = s.executeQuery("SELECT COURSE_NO FROM COURSE WHERE COURSE_CODE = '" + courseCode + "';");
+        if (rs.next()) {
+            courseNo = rs.getInt(1);
+        }
+        return courseNo;
+    }
+
+    public String getCourseCode(int cno) throws SQLException {
+        Statement s = conn.createStatement();
+        String courseCode = new String();
+        ResultSet rs = s.executeQuery("SELECT COURSE_CODE FROM COURSE WHERE COURSE_NO = " + cno + ";");
+        if (rs.next()) {
+            courseCode = rs.getString(1);
+        }
+        return courseCode;
+
+    }
+
+    public int getRoomNo(String roomName) throws SQLException {
+        Statement s = conn.createStatement();
+        int roomNo = 0;
+        ResultSet rs = s.executeQuery("SELECT ROOM_NO FROM ROOM WHERE ROOM_NAME = '" + roomName + "';");
+        if (rs.next()) {
+            roomNo = rs.getInt(1);
+        }
+        return roomNo;
+    }
+    
+    public String getRoom(int roomNo) throws SQLException {
+        Statement s = conn.createStatement();
+        String room = "";
+        ResultSet rs = s.executeQuery("SELECT ROOM_NAME FROM ROOM WHERE ROOM_NO = " + roomNo + ";");
+        if (rs.next()) {
+            room = rs.getString(1);
+        }
+        return room;
+    }
+
     public ArrayList<ArrayList<String>> getAllClashes() throws SQLException {
         Statement s = conn.createStatement();
-        
+
         ArrayList<ArrayList<String>> results = new ArrayList<>();
 
         for (int i = 1; i <= 40; i++) {
             ArrayList<String> tempResult = new ArrayList<>();
-            ResultSet rs = s.executeQuery("SELECT C.COURSE_NO, C.COURSE_CODE, R.ROOM_NAME "
+            ResultSet rs = s.executeQuery("SELECT C.COURSE_CODE "
                     + "FROM COURSE_TIMESLOT CT "
                     + "JOIN COURSE C ON CT.COURSE_NO_FK2 = C.COURSE_NO "
                     + "JOIN ROOM R ON CT.ROOM_NO_FK = R.ROOM_NO "
                     + "WHERE CT.TIMESLOT_NO_FK = " + i);
             while (rs.next()) {
-                
+
                 String temp;
-                temp = rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3);
+                temp = rs.getString(1);
                 tempResult.add(temp);
             }
 
@@ -122,19 +144,20 @@ public class DBReader {
         }
         return results;
     }
-    
-    public ArrayList<String> getCourseList() throws SQLException{
+
+    public ArrayList<String> getCourseList() throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<String> result = new ArrayList<>();
         ResultSet rs = s.executeQuery("SELECT COURSE_CODE, COURSE_NAME "
                 + "FROM COURSE "
-                + "ORDER BY COURSE_NAME ASC;");
+                + "ORDER BY COURSE_CODE ASC;");
         while (rs.next()) {
             result.add(rs.getString(1) + " : " + rs.getString(2));
         }
-        
+
         return result;
     }
+
     //Return list of Student IDs enrolled in the given course
     public ArrayList<String> getCourseEnrolments(int cno) throws SQLException {
         Statement s = conn.createStatement();
@@ -145,13 +168,13 @@ public class DBReader {
         }
         return result;
     }
-    
+
     //Return list of courses having timing clashes with the given course
     public ArrayList<Integer> getCourseClashes(int cno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<Integer> result = new ArrayList<>();
         ResultSet rs = s.executeQuery("SELECT COURSE_NO_FK2 "
-                + "FROM COURSE_TIMESLOT "               
+                + "FROM COURSE_TIMESLOT "
                 + "WHERE TIMESLOT_NO_FK IN (SELECT TIMESLOT_NO_FK FROM COURSE_TIMESLOT WHERE COURSE_NO_FK2 = " + cno + ") "
                 + "AND COURSE_NO_FK2 <> " + cno + ";");
         while (rs.next()) {
@@ -159,25 +182,23 @@ public class DBReader {
         }
         return result;
     }
-    
+
     //Return list of courses having an enrolment conflict (also timing clash) with given course
-    public ArrayList<String> getCourseConflicts(int cno) throws SQLException{
+    public ArrayList<String> getCourseConflicts(int cno) throws SQLException {
         ArrayList<String> result = new ArrayList<>();
         ArrayList<Integer> clashes = getCourseClashes(cno);
-        for(int i = 0; i<clashes.size(); i++){
+        for (int i = 0; i < clashes.size(); i++) {
             int clash = clashes.get(i);
             float percentage = getCourseConflictPercentage(cno, clash);
-            if(percentage>0){
+            if (percentage > 0) {
 //                conflicts.add(clash);
                 result.add(getCourseCode(clash) + " -> " + String.format("%.2f", percentage) + "%");
             }
         }
-        
-        
-        
+
         return result;
     }
-    
+
     //Returns percentage of students enrolled in both given courses over total students in both (Intersection/Union)
     public float getCourseConflictPercentage(int cno1, int cno2) throws SQLException {
         ArrayList<String> enrolments1 = getCourseEnrolments(cno1);
@@ -190,8 +211,6 @@ public class DBReader {
         float common = enrolments1.size();
         return (common * 100) / total;
     }
-
-    
 
     //Return list of courses scheduled at the given timeslot
 //    public ArrayList<Integer> getTimeslotClashes(int tsno) throws SQLException {
@@ -207,7 +226,6 @@ public class DBReader {
 //        return result;
 //    }
 //    
-    
     public boolean isTimeslotConflicted(int tsno) throws SQLException {
         Statement s = conn.createStatement();
         ArrayList<Integer> timeslotCourses = new ArrayList<>();
@@ -217,19 +235,19 @@ public class DBReader {
         while (rs.next()) {
             timeslotCourses.add(rs.getInt(1));
         }
-        while(!timeslotCourses.isEmpty()){
+        while (!timeslotCourses.isEmpty()) {
             int current = timeslotCourses.get(0);
             timeslotCourses.remove(0);
-            for(int temp : timeslotCourses){
+            for (int temp : timeslotCourses) {
                 float pct = getCourseConflictPercentage(current, temp);
-                if(pct > 0){
+                if (pct > 0) {
                     return true;
                 }
             }
         }
         return false;
     }
-    
+
 //
 //    //Return list of Course Numbers the given student is enrolled in
 //    public ArrayList<Integer> queryStudentCourses(String sid) throws SQLException {
@@ -281,10 +299,8 @@ public class DBReader {
 //        return ccode;
 //    }
 //    
-
     public ArrayList<String> getCourseConflicts() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
 }

@@ -277,13 +277,6 @@ public class ScheduleTranslator {
             } 
             i++;
         }
-//        for (int i = 0; i < coursesTSInfo.size(); i++) {
-//            
-//
-//            
-//            
-//            
-//        }        
         
         
         return instructions;
