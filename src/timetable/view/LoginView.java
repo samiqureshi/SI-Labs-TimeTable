@@ -356,6 +356,8 @@ public class LoginView extends Application {
                 courseInfoRoom = new Label("Room: " + courseRoom);
                 
                 
+                
+                
                 courseInfoTitle.setId("course-info-title");
                 courseInfoRoom.setId("course-info-room");
 //            hbResultTitle.setAlignment(Pos.CENTER);
